@@ -1,0 +1,30 @@
+border-top-1px($color)
+  position: relative
+  &::before
+    display: block
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    border-top: 1px solid $color
+    content: ''
+
+border-bottom-1px($color)
+  position: relative
+  &::after
+    display: block
+    position: absolute
+    bottom: 0
+    left: 0
+    width: 100%
+    border-bottom: 1px solid $color
+    content: ''
+
+
+border-none()
+  border-top: none
+
+bg-image($url)
+  background-image: url($url + '@2x.png')
+  @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3)
+    background-image: url($url + '@3x.png')
