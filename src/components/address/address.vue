@@ -67,7 +67,7 @@
       padding: 0 20px 20px
       li
         margin-bottom: 40px
-        padding-right: 70px
+        padding-right: 30px
         background: url(./right.png) right center no-repeat
         background-size: 9px 15px
         .info

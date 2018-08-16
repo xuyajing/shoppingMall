@@ -85,10 +85,11 @@
         height: 45px
         padding: 0 25px
         label
+          width: 75px
           font-size: 14px
           color: #999
         .rightWrap
-          width: 245px
+          flex: 1
           height: 100%
           &.inputWrap, &.areaWrap
             border-bottom-1px(#e9e9e9)
@@ -126,10 +127,11 @@
           height: 162px
           align-items: flex-start
           label
+            width: 75px
             height: 45px
             line-height: 45px
           .textareaWrap
-            width: 245px
+            flex: 1
             height: 100%
             textarea
               width: 100%

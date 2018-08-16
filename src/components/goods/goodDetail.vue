@@ -525,9 +525,10 @@
     .share
       position: fixed
       top: 25%
-      left: 8vw
-      width: 84vw
-      height: 64vw
+      left: 50%
+      margin-left: -150px
+      width: 300px
+      height: 240px
       background: #fff
       border-radius: 10px
       .title
