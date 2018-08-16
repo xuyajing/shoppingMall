@@ -1,4 +1,4 @@
-# vue-sell2
+# vue-shoppingMall
 
 > A Vue.js project
 
