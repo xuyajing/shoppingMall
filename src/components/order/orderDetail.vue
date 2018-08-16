@@ -68,7 +68,7 @@
                 <span class="text">兑换码</span>
                 <span class="value">￥400</span>
               </li>
-              <li class="total">
+              <li :class="type===1 ? 'total' : ''">
                 <span class="text">订单总价</span>
                 <span class="value">￥720</span>
               </li>
@@ -334,9 +334,13 @@
             color: #333
             .value
               color: #999
-            &.total
+            &:last-child
               .value
                 color: #f53663
+            &:nth-child(2)
+              &.total
+                .value
+                  color: #f53663
       .orderInfoWrap
         border-bottom-1px(#dfdfdf)
         ul

@@ -49,7 +49,7 @@
                   <div class="count">共2件商品</div>
                   <div class="totalWrap">合计：<span>￥720</span></div>
                 </div>
-                <div class="footBtnWrap">
+                <div class="footBtnWrap border-1px">
                   <a class="btnCancel btn">取消订单</a>
                   <a class="btnContinue btn">继续兑换</a>
                 </div>
@@ -120,8 +120,8 @@
                   <div class="count">共2件商品</div>
                   <div class="totalWrap">合计：<span>￥720</span></div>
                 </div>
-                <div class="invalidTipsWrap">优惠活动已过期，请重新下单</div>
-                <div class="footBtnWrap">
+                <div class="invalidTipsWrap border-1px">优惠活动已过期，请重新下单</div>
+                <div class="footBtnWrap border-1px">
                   <a class="btnCancel btn">取消订单</a>
                   <a class="btnContinue btn" v-show="isValid">继续兑换</a>
                 </div>
@@ -205,7 +205,7 @@
                   <div class="count">共2件商品</div>
                   <div class="totalWrap">合计：<span>￥720</span></div>
                 </div>
-                <div class="footBtnWrap">
+                <div class="footBtnWrap border-1px">
                   <span class="">物流单号：20739564973539569</span>
                   <a class="btnConfirm btn">确认收货</a>
                 </div>
@@ -343,7 +343,7 @@
     left: 0
     width: 100%
     height: 45px
-    padding: 0 5px
+    padding: 0 5px 0 12px
     box-sizing: border-box
     border-bottom-1px(#dfdfdf)mv
     display: flex
@@ -356,6 +356,7 @@
       a
         position: relative
         display: inline-block
+        width: 100%
         height: 100%
         line-height: 43px
         box-sizing: border-box

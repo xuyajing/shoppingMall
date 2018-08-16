@@ -39,7 +39,7 @@
     color: #f53663
     .btnBack
       position: absolute
-      left: 20px
+      left: 15px
       top: 15px
       width: 10px
       height: 17px
