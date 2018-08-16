@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="contentWrap" ref="contentWrap">
-      <ul class="goodsList" v-show="showResult">
+      <ul class="goodsList" v-show="!showResult">
         <li class="border-1px">
           <router-link to="/goods/detail/1">
             <img src="./img2.png" />
@@ -42,10 +42,10 @@
     },
     computed: {
       showResult() {
-        if (this.searchResult.length > 0) {
-          return true;
-        }
-        return false;
+//        if (this.searchResult.length > 0) {
+//          return true;
+//        }
+        return true;
       }
     },
     methods: {

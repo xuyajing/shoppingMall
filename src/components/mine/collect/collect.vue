@@ -1,13 +1,14 @@
 <template>
   <transition name="move">
     <div class="collectWrap">
-      <top-header :title="title" :operation="operation"></top-header>
+      <top-header :title="title" :operation="operation" @doRight="showDeleteDisabledDialog"></top-header>
       <div class="collectListWrap">
         <ul class="collectList">
           <li class="border-1px">
             <router-link to="">
               <img src="../img2.png" />
               <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
+              <span class="time">2018-02-02</span>
               <span class="price">¥120</span>
             </router-link>
           </li>
@@ -15,6 +16,7 @@
             <router-link to="">
               <img src="../img2.png" />
               <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
+              <span class="time">2018-02-02</span>
               <span class="price">¥120</span>
               <div class="disabledFlag" v-show="isDisabled">
                 <span>已失效</span>
@@ -23,12 +25,12 @@
           </li>
         </ul>
       </div>
-      <div class="popupDeleteWrap" v-show="showDeleteFail">
+      <div class="popupDeleteWrap" v-show="showDeleteDisabled">
         <div class="title">删除提醒</div>
         <div class="content">确定从收藏里删除该宝贝吗？</div>
         <div class="btnWrap border-1px">
-          <a class="btnCancel btn">取消</a>
-          <a class="btnConfirm btn">确定</a>
+          <a class="btnCancel btn" @click.stop.prevent="cancelDeleteDisabled">取消</a>
+          <a class="btnConfirm btn" @click.stop.prevent="deleteDisabled">确定</a>
         </div>
       </div>
       <div class="mask" v-show="showMask"></div>
@@ -45,9 +47,24 @@
               title: '收藏宝贝',
               operation: '清空失效',
               isDisabled: true,
-              showDeleteFail: false,
+              showDeleteDisabled: false,
               showMask: false
           };
+      },
+      methods: {
+        showDeleteDisabledDialog() {
+            this.showMask = true;
+            this.showDeleteDisabled = true;
+        },
+        cancelDeleteDisabled() {
+            this.showMask = false;
+            this.showDeleteDisabled = false;
+        },
+        deleteDisabled() {
+          this.showMask = false;
+          this.showDeleteDisabled = false;
+        }
+
       },
       components: {
         topHeader
@@ -78,30 +95,34 @@
     .collectList
       margin: 0 12px
       li
+        position: relative
         border-bottom-1px(#ccc)
         margin-bottom: 10px
         padding-bottom: 10px
         &:last-child
           &:after
             border: none
-        &.disabled
-          opacity: 0.5
         a
           display: block
           overflow: hidden
           img
             float: left
-            width: 115px
+            width: 120px
             margin-right: 12px
           .title
             display: block
             height: 34px
-            padding: 10px 10px 20px 0
+            padding: 10px 10px 8px 0
             line-height: 17px
             font-size: 14px
             text-overflow: ellipsis
             color: #1a1a1a
             overflow: hidden
+          .time
+            display: block
+            padding-bottom: 5px
+            font-size: 12px
+            color: #999
           .price
             display: block
             line-height: 17px
@@ -116,13 +137,15 @@
             display: flex
             align-items: center
             justify-content: center
+            background: rgba(255, 255, 255, 0.8)
             span
               width: 58px
               height: 58px
               border-radius: 50%
               text-align: center
               line-height: 58px
-              background: rgba(0, 0, 0, 0.5)
+              background: rgba(0, 0, 0, 0.8)
+              opacity: 0.8
               color: #fff
               font-size: 15px
   .popupDeleteWrap

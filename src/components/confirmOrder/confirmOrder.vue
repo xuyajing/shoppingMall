@@ -1,7 +1,7 @@
 <template>
   <div class="confirmOrderWrap">
     <top-header :title="title"></top-header>
-    <div class="contentWrap">
+    <div class="confirmOrderMain">
       <div class="main" ref="main">
         <div class="addAddressWrap" v-show="hasNoAddr">
           <div class="left">
@@ -39,19 +39,19 @@
         </ul>
         <div class="calulateWrap">
           <div class="total">合计：<span>￥480</span></div>
-          <a class="btnExchange">去兑换</a>
+          <a class="btnExchange" @click.stop.prevent="exchangeGoods">去兑换</a>
         </div>
         <div class="footPopupWrap">
           <transition name="fold">
             <div class="paymentMethodWrap" v-show="showPaymentMethod">
               <div class="inputWrap" v-show="isFirstStep">
-                <a class="btnClose"></a>
+                <a class="btnClose" @click.stop.prevent="hideExchangePanel"></a>
                 <input type="text" class="exchangeCode" placeholder="请输入兑换码，可为空"/>
-                <a class="btnNextStep btn">下一步</a>
+                <a class="btnNextStep btn" @click.stop.prevent="nextStep">下一步</a>
                 <p class="tips">如果没有兑换码，请直接点击下一步</p>
               </div>
-              <div class="compareWrap">
-                <a class="btnClose"></a>
+              <div class="compareWrap" v-show="!isFirstStep">
+                <a class="btnClose" @click.stop.prevent="hideExchangePanel"></a>
                 <p class="total">总价：{{total}}元</p>
                 <p class="codeValue">兑换码：{{exchangeCodeValue}}元</p>
                 <p class="toPay">实付：{{toPay}}元</p>
@@ -85,7 +85,7 @@
           showPaymentMethod: false,
           showMask: false,
           showDisabled: false,
-          isFirstStep: false,
+          isFirstStep: true,
           total: 920.00,
           exchangeCodeValue: 800.00
         };
@@ -99,6 +99,19 @@
               }
           }
       },
+      methods: {
+        exchangeGoods() {
+            this.showPaymentMethod = true;
+            this.showMask = true;
+        },
+        hideExchangePanel() {
+          this.showPaymentMethod = false;
+          this.showMask = false;
+        },
+        nextStep() {
+            this.isFirstStep = false;
+        }
+      },
       components: {
         topHeader
       }
@@ -109,7 +122,7 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import '../../common/stylus/mixin.styl';
 
-.contentWrap
+.confirmOrderMain
   position: absolute
   top: 50px
   left: 0

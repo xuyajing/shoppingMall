@@ -64,15 +64,15 @@
           </ul>
           <div class="numberWrap border-1px">
             <ul>
-              <li v-show="isPayed">
+              <li v-show="type!==1">
                 <span class="text">兑换码</span>
                 <span class="value">￥400</span>
               </li>
-              <li>
+              <li class="total">
                 <span class="text">订单总价</span>
                 <span class="value">￥720</span>
               </li>
-              <li v-show="isPayed">
+              <li v-show="type!==1">
                 <span class="text">实付</span>
                 <span class="value">￥320</span>
               </li>
@@ -82,8 +82,8 @@
             <ul>
               <li>订单编号：767676678899099009900</li>
               <li>创建时间：2018-07-19 09:09:09</li>
-              <li v-show="isPayed">交易流水号：20170909787324637824638</li>
-              <li v-show="isPayed">付款时间：2018-07-19 10:00:00</li>
+              <li v-show="type!==1">交易流水号：20170909787324637824638</li>
+              <li v-show="type!==1">付款时间：2018-07-19 10:00:00</li>
             </ul>
           </div>
           <div class="footBtnWrap" v-show="type===1">
@@ -204,7 +204,7 @@
         display: flex
         align-items: center
         height: 45px
-        padding: 0 20px
+        padding: 0 24px
         box-sizing: border-box
         background: #f53663
         color: #fff
@@ -315,10 +315,10 @@
                 color: #999
                 em
                   font-style: normal
-                  color: #f53663
+                  color: #999
               .total
                 font-size: 12px
-                color: #f53663
+                color: #999
       .numberWrap
         border-top-1px(#dfdfdf)
         border-bottom-1px(#dfdfdf)
@@ -334,7 +334,7 @@
             color: #333
             .value
               color: #999
-            &:last-child
+            &.total
               .value
                 color: #f53663
       .orderInfoWrap
@@ -422,7 +422,7 @@
     z-index: 10
     width: 100%
     height: 100%
-    background: rgba(0, 0, 0, 0.5)
+    background: rgba(0, 0, 0, 0.8)
   .stickFootWrap
     position: fixed
     bottom: 0

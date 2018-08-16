@@ -15,6 +15,7 @@
             <span class="value">V.1.1.2</span>
           </li>
         </ul>
+        <router-link to="/login" class="btnLogout">退出登录</router-link>
       </div>
       <keep-alive>
         <router-view></router-view>
@@ -93,4 +94,15 @@
           box-sizing: border-box
           font-size: 14px
           color: #999
+    .btnLogout
+      display: block
+      margin: 50px 12px
+      height: 40px
+      text-align: center
+      line-height: 40px
+      border-radius: 20px
+      font-size: 14px
+      color: #fff
+      background: #f53663
+
 </style>

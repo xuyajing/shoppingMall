@@ -5,12 +5,12 @@
       <a class="btnEdit topBtn" v-show="!isEdit" @click.stop.prevent="edit">编辑</a>
       <a class="btnComplete topBtn" v-show="isEdit" @click.stop.prevent="complete">完成</a>
     </div>
-    <div class="contentWrap">
+    <div class="shopcartMain">
       <div class="content" ref="$ref">
-        <ul v-show="goodsList.length>0">
-          <li class="border-1px">
+        <ul v-show="!isEmpty">
+          <li class="border-1px" v-for="(item, index) in goodsList" :key="index">
             <router-link to="/">
-              <span class="icon"></span>
+              <span class="icon" :class="item.isSelected ? 'selected' : ''" @click.stop.prevent="toggleSelect(index)"></span>
               <img src="./cartShopImg.png"  class="thumb"/>
               <div class="infoWrap">
                 <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
@@ -37,7 +37,7 @@
               <div class="infoWrap">
                 <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
                 <div class="miniCartControlWrap">
-                  <span class="txt">发货数量：</span>
+                  <span class="txt">发货数量:</span>
                   <div class="cartControl">
                     <span class="cartDecrease">
                       <img src="./reduce.png" width="12px">
@@ -56,7 +56,7 @@
             </router-link>
           </li>
         </ul>
-        <div class="noResult" v-show="goodsList.length===0">
+        <div class="noResult" v-show="isEmpty">
           <img src="./empty.png" width="68px" />
           <span class="txt">购物车还没有商品哦</span>
           <a class="btnView">去逛逛</a>
@@ -69,11 +69,11 @@
         </div>
         <div class="calulateWrap" v-show="!isEdit">
           <div class="total">合计：<span>￥480</span></div>
-          <a class="btnCal">结算</a>
+          <router-link to="/confirmOrder" class="btnCal">结算</router-link>
         </div>
         <div class="editWrap" v-show="isEdit">
-          <a class="btnClearDisabled">清空失效商品</a>
-          <a class="btnDelete">删除</a>
+          <a class="btnClearDisabled" @click.stop.prevent="emptyDisabled">清空失效商品</a>
+          <a class="btnDelete" @click.stop.prevent="deleteSelected">删除</a>
         </div>
       </div>
     </div>
@@ -89,7 +89,10 @@
           return {
             isEdit: false,
             isDisabled: true,
-            goodsList: ['aa']
+            goodsList: [{
+                isSelected: false
+            }],
+            isEmpty: false
           };
       },
       methods: {
@@ -98,6 +101,12 @@
         },
         complete() {
           this.isEdit = false;
+        },
+        empty() {
+
+        },
+        toggleSelect(index) {
+            this.goodsList[index].isSelected = !this.goodsList[index].isSelected;
         }
       },
       components: {
@@ -128,7 +137,7 @@
       right: 12px
       color: #f53663
       font-size: 14px
-  .contentWrap
+  .shopcartMain
     position: absolute
     top: 60px
     bottom: 50px
@@ -143,11 +152,11 @@
       ul
         padding: 0 12px
         li
+          position: relative
+          height: 90px
           margin-bottom: 10px
           padding-bottom: 10px
           border-bottom-1px(#dfdfdf)
-          &.disabled
-            opacity: 0.5
           a
             position: relative
             display: flex
@@ -161,10 +170,13 @@
               background-image: url(./unselected.png)
               background-size: 100%
               background-repeat: no-repeat
+              &.selected
+                background-image: url(./selected.png)
             .thumb
               width: 120px
               margin-right: 10px
             .infoWrap
+              height: 100%
               .title
                 height: 34px
                 line-height: 17px
@@ -176,7 +188,7 @@
               .miniCartControlWrap
                 display: flex
                 align-items: center
-                margin-bottom: 10px
+                margin-bottom: 6px
                 .txt
                   margin-right: 10px
                   font-size: 11px
@@ -211,13 +223,15 @@
               display: flex
               align-items: center
               justify-content: center
+              background: rgba(255, 255, 255, 0.8)
               span
                 width: 58px
                 height: 58px
                 border-radius: 50%
                 text-align: center
                 line-height: 58px
-                background: rgba(0, 0, 0, 0.5)
+                background: rgba(0, 0, 0, 0.8)
+                opacity: 0.8
                 color: #fff
                 font-size: 15px
       .noResult

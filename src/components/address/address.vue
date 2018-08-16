@@ -37,7 +37,7 @@
   export default {
       data() {
           return {
-              title: '地址',
+              title: '地址管理',
               operation: '新建',
               selectedNumber: 0
           };
@@ -82,7 +82,7 @@
             font-size: 11px
             color: #f53663
           .addressee
-            flex: 1
+            margin-right: 17px
             font-size: 14px
             color: #333
           .phoneNumber

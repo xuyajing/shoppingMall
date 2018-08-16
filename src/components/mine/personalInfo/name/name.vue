@@ -53,7 +53,7 @@
       height: 40px
       line-height: 40px
       margin: 43px 30px 50px
-      border: 1px solid #dfdfdf
+      border: 1px solid #999
       box-sizing: border-box
       border-radius: 20px
       .icon

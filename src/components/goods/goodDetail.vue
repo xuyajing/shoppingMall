@@ -32,7 +32,7 @@
       <div class="footBarWrap">
         <div class="collectWrap" :class="{'active': isCollect}" @click.prevent="toggleCollect">
           <span class="icon iconCollect"></span>
-          <p class="txt">收藏</p>
+          <p class="txt">{{collectTxt}}</p>
         </div>
         <div class="shopCartWrap">
           <span class="icon iconShopCart"></span>
@@ -133,6 +133,7 @@
             isCollect: false, // 是否已收藏
             isAddToShopCart: false, // 是否加入购物车
             messageTxt: '收藏成功',
+            collectTxt: '收藏',
             isShowMessage: false,
             collectTimeout: null,
             addToShopCartTimeout: false,
@@ -165,8 +166,10 @@
             this.isShowMessage = true;
             if (this.isCollect) {
               this.messageTxt = '收藏成功';
+              this.collectTxt = '已收藏';
             } else {
                 this.messageTxt = '取消收藏成功';
+                this.collectTxt = '收藏';
             }
             this.collectTimeout = setTimeout(() => {
               this.isShowMessage = false;
@@ -319,7 +322,8 @@
             display: inline-block
             margin-bottom: 10px
             padding-bottom: 5px
-            border-bottom: 1px solid #c93756
+            border-bottom: 2px solid #c93756
+            font-size: 12px
             color: #f53663
             font-family: 'SimHei'
   .footBarWrap
@@ -329,7 +333,7 @@
     bottom: 0
     left: 0
     width: 100%
-    height: 46px
+    height: 48px
     padding: 0 12px
     box-sizing: border-box
     background: #fff
@@ -361,6 +365,7 @@
         margin: 0
         font-size: 10px
         text-align: center
+        color: #686868
     .shopCartWrap
       position: relative
       width: 52px
@@ -371,7 +376,7 @@
         display: block
         width: 21px
         height: 20px
-        margin: 5px auto
+        margin: 5px 0 0 13px
         background: url(./shoppingCart.png)
         background-size: 100%
         background-repeat: no-repeat
@@ -383,6 +388,7 @@
         margin: 0
         font-size: 10px
         text-align: center
+        color: #686868
     .btn
       display: block
       margin-left: 7px
@@ -473,7 +479,7 @@
                 line-height: 30px
                 border: 1px solid #909090
                 box-sizing: border-box
-                border-radius: 4px
+                border-radius: 10px
                 text-align: center
                 font-size: 12px
                 color: #909090

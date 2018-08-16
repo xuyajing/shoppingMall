@@ -65,6 +65,7 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">
+  @import '../../../common/stylus/mixin.styl';
 .modifyAddressWrap
   position: fixed
   top: 0
@@ -93,6 +94,7 @@
           width: 75px
           font-size: 14px
           color: #999
+          font-family: 'PingFang SC', 'SimHei'
         .rightWrap
           flex: 1
           height: 100%
@@ -103,6 +105,7 @@
             height: 100%
             font-size: 14px
             color: #2b2b2b
+            font-family: 'PingFang SC', 'SimHei'
           &.areaWrap
             display: flex
             input
@@ -148,6 +151,7 @@
               font-size: 14px
               color: #2b2b2b
               background: #f7f7f7
+              font-family: 'PingFang SC', 'SimHei'
               outline: none
               border: none
     .btnConfirm

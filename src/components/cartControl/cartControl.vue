@@ -32,7 +32,8 @@
   .cartCount
     display: inline-block
     vertical-align: middle
-    padding: 0 10px
+    width: 50px
+    text-align: center
     height: 26px
     line-height: 26px
     font-size: 14px

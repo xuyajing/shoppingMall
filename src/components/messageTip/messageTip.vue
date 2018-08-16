@@ -30,7 +30,7 @@
   width: 56vw
   height: 18vw
   opacity: 1
-  background: rgba(0, 0, 0, 0.8)
+  background: rgba(0, 0, 0, 0.9)
   border-radius: 10px
   &.fade-enter-active, &.fade-leave-active
     transition: all 0.5s linear

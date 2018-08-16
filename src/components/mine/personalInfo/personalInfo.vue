@@ -116,7 +116,7 @@
     transform: translate3d(100%, 0, 0)
   .infoWrap
     position: absolute
-    top: 60px
+    top: 50px
     left: 0
     width: 100%
     ul
@@ -127,13 +127,14 @@
         height: 45px
         border-bottom-1px(#e9e9e9)
         &:first-child
-          height: 90px
+          height: 70px
         a
           display: flex
           align-items: center
           width: 100%
           height: 100%
         .text
+          padding-left: 13px
           font-size: 14px
           color: #2b2b2b
         .avatar
@@ -179,7 +180,9 @@
         transform: translate3d(0, 0, 0)
       ul
         li
+          width: 93vw
           height: 50px
+          margin: 0 auto
           line-height: 50px
           text-align: center
           border-bottom-1px(#e9e9e9)
@@ -187,8 +190,12 @@
           font-size: 14px
           color: #999
           &.title
+            width: 100%
             height: 53px
             line-height: 53px
+          &:last-child
+            &:after
+              border: none
             strong
               font-size: 15px
               color: #1b1b1b

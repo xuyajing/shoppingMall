@@ -96,7 +96,7 @@
                   <a class="btnContinue btn">继续兑换</a>
                 </div>
               </section>
-              <section>
+              <section class="overdue">
                 <div class="orderNumberWrap">
                   <span class="number">20739564973539569</span>
                   <span class="state">待兑换</span>
@@ -369,7 +369,7 @@
             bottom: 1px
             left: 0
             width: 100%
-            height: 2px
+            height: 3px
             background: #f53663
             border-radius: 4px
   .ordersContentWrap
@@ -434,10 +434,10 @@
                     color: #999
                     em
                       font-style: normal
-                      color: #f53663
+                      color: #999
                   .total
                     font-size: 12px
-                    color: #f53663
+                    color: #999
           .calulateWrap, .invalidTipsWrap
             border-bottom-1px(#dfdfdf)
             display: flex
@@ -478,4 +478,8 @@
               padding-left: 12px
               font-size: 12px
               color: #303030
+          &.overdue
+            .footBtnWrap
+              .btnCancel
+                background: #f53663
 </style>

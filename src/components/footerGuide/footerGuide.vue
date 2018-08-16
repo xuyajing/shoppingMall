@@ -72,24 +72,24 @@
               background-image: url(./mine_active.png)
           .home
             display: block
-            width: 19px
-            height: 19px
+            width: 20px
+            height: 20px
             margin: 5px auto
             background-image: url(./home.png)
             background-size: 100%
             background-repeat: no-repeat
           .goods
             display: block
-            width: 20px
-            height: 21px
+            width: 21px
+            height: 22px
             margin: 4px auto
             background-image: url(./commodity.png)
             background-size: 100%
             background-repeat: no-repeat
           .shopCart
             display: block
-            width: 20px
-            height: 21px
+            width: 21px
+            height: 20px
             margin: 4px auto
             background-image: url(./shoppingCart.png)
             background-size: 100%

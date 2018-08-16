@@ -112,7 +112,7 @@
     .personInfoWrap
       display: flex
       align-items: center
-      justify-content: center
+      padding-left: 27px
       width: 100%
       height: 41vw
       background-image: url(./rect.png)
@@ -156,7 +156,7 @@
         .icon
           width: 16px
           height: 19px
-          margin: 0 11px 0 14px
+          margin: 0 11px 0 15px
           background-image: url(./order.png)
           background-size: 100%
           background-repeat: no-repeat
@@ -174,13 +174,12 @@
     .tabs
       display: flex
       align-items: center
-      justify-content: center
+      justify-content: space-between
       margin-top: 15px
-      padding-bottom: 14px
+      padding: 0 27px 14px 27px
       border-bottom-1px(#e9e9e9)
       li
         width: 50px
-        margin-right: 36px
         &:nth-child(1)
           a
             .icon
@@ -193,7 +192,7 @@
           a
             .icon
               background: #df8142
-        &:nth-child(4)
+        &:last-child
           margin-right: 0
           a
             .icon

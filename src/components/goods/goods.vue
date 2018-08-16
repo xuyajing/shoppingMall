@@ -97,7 +97,7 @@
     .goodsList
       margin: 0 12px
       li
-        border-bottom-1px(#ccc)
+        border-bottom-1px(#dfdfdf)
         margin-bottom: 10px
         padding-bottom: 10px
         &:last-child
@@ -108,7 +108,7 @@
           overflow: hidden
           img
             float: left
-            width: 115px
+            width: 120px
             margin-right: 12px
           .title
             display: block
