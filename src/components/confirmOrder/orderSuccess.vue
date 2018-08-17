@@ -4,8 +4,8 @@
       <span class="icon"></span>
       <p>下单成功</p>
     </div>
-    <a class="btn btnHome">返回首页</a>
-    <a class="btn btnView">查看订单</a>
+    <router-link to="/" class="btn btnHome" >返回首页</router-link>
+    <router-link :to="{path: '/orders/detail', query: {type: 2}}"  class="btn btnView">查看订单</router-link>
   </div>
 </template>
 

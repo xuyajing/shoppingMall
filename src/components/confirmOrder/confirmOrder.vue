@@ -56,7 +56,7 @@
                 <p class="codeValue">兑换码：{{exchangeCodeValue}}元</p>
                 <p class="toPay">实付：{{toPay}}元</p>
                 <a class="btnOrder btn" v-show="total<=exchangeCodeValue">确定下单</a>
-                <a class="btnPay btn" v-show="total>exchangeCodeValue">微信支付</a>
+                <a class="btnPay btn" v-show="total>exchangeCodeValue" @click.stop.prevent="wechatPay">微信支付</a>
               </div>
             </div>
           </transition>
@@ -110,6 +110,9 @@
         },
         nextStep() {
             this.isFirstStep = false;
+        },
+        wechatPay() {
+            this.$router.push('/confirmOrder/success');
         }
       },
       components: {

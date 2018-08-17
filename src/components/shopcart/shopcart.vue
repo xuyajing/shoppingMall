@@ -92,7 +92,7 @@
             goodsList: [{
                 isSelected: false
             }],
-            isEmpty: false
+            isEmpty: true
           };
       },
       methods: {
