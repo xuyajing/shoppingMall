@@ -108,9 +108,11 @@
             this.isFirstStep = false;
         },
         paySuccess() {
+          this.isFirstStep = true;
           this.$router.push('/confirmOrder/success');
         },
         payFail() {
+          this.isFirstStep = true;
           this.showPaymentMethod = false;
           this.showMask = false;
           this.$router.push({path: '/orders/detail', query: {type: 1}});
