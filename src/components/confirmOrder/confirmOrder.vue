@@ -108,7 +108,7 @@
             this.isFirstStep = false;
         },
         paySuccess() {
-          this.$router.push({path: '/orders/success'});
+          this.$router.push('/confirmOrder/success');
         },
         payFail() {
           this.showPaymentMethod = false;
