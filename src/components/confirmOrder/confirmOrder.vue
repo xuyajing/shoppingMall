@@ -51,12 +51,12 @@
                 <p class="tips">如果没有兑换码，请直接点击下一步</p>
               </div>
               <div class="compareWrap" v-show="!isFirstStep">
-                <a class="btnClose" @click.stop.prevent="hideExchangePanel"></a>
+                <a class="btnClose" @click.stop.prevent="payFail"></a>
                 <p class="total">总价：{{total}}元</p>
                 <p class="codeValue">兑换码：{{exchangeCodeValue}}元</p>
                 <p class="toPay">实付：{{toPay}}元</p>
                 <a class="btnOrder btn" v-show="total<=exchangeCodeValue">确定下单</a>
-                <a class="btnPay btn" v-show="total>exchangeCodeValue" @click.stop.prevent="wechatPay">微信支付</a>
+                <a class="btnPay btn" v-show="total>exchangeCodeValue" @click.stop.prevent="paySuccess">微信支付</a>
               </div>
             </div>
           </transition>
@@ -104,15 +104,16 @@
             this.showPaymentMethod = true;
             this.showMask = true;
         },
-        hideExchangePanel() {
-          this.showPaymentMethod = false;
-          this.showMask = false;
-        },
         nextStep() {
             this.isFirstStep = false;
         },
-        wechatPay() {
-            this.$router.push('/confirmOrder/success');
+        paySuccess() {
+          this.$router.push({path: '/orders/success'});
+        },
+        payFail() {
+          this.showPaymentMethod = false;
+          this.showMask = false;
+          this.$router.push({path: '/orders/detail', query: {type: 1}});
         }
       },
       components: {
