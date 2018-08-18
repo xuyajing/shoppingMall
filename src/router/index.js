@@ -8,6 +8,8 @@ import mine from 'components/mine/mine';
 import login from 'components/login/login';
 import loginSelect from 'components/loginSelect/loginSelect';
 import register from 'components/register/register';
+import bindPhoneNumber from 'components/bindPhoneNumber/bindPhoneNumber';
+import setPassword from 'components/setPassword/setPassword';
 import forget from 'components/forget/forget';
 import search from 'components/search/search';
 import address from 'components/address/address';
@@ -85,7 +87,13 @@ export default new Router({
       path: '/register', // 注册
       component: register
     }, {
-      path: '/forget', // 注册
+      path: '/bindPhoneNumber',
+      component: bindPhoneNumber
+    }, {
+      path: '/setPassword',
+      component: setPassword
+    }, {
+      path: '/forget', // 忘记密码
       component: forget
     }, {
       path: '/search', // 搜索
