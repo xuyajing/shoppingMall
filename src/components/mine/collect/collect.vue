@@ -25,14 +25,7 @@
           </li>
         </ul>
       </div>
-      <div class="popupDeleteWrap" v-show="showDeleteDisabled">
-        <div class="title">删除提醒</div>
-        <div class="content">确定从收藏里删除该宝贝吗？</div>
-        <div class="btnWrap border-1px">
-          <a class="btnCancel btn" @click.stop.prevent="cancelDeleteDisabled">取消</a>
-          <a class="btnConfirm btn" @click.stop.prevent="deleteDisabled">确定</a>
-        </div>
-      </div>
+      <tipdialog :title="tipdialogTitle" :content="tipdialogContent" @cancel="cancelDeleteDisabled" @confirm="deleteDisabled" v-show="showDeleteDisabled"></tipdialog>
       <div class="mask" v-show="showMask"></div>
     </div>
   </transition>
@@ -40,6 +33,7 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import tipdialog from 'components/common/tipdialog/tipdialog';
 
   export default {
       data() {
@@ -48,7 +42,9 @@
               operation: '清空失效',
               isDisabled: true,
               showDeleteDisabled: false,
-              showMask: false
+              showMask: false,
+              tipdialogTitle: '删除',
+              tipdialogContent: '确定从收藏里删除该宝贝吗？'
           };
       },
       methods: {
@@ -67,7 +63,8 @@
 
       },
       components: {
-        topHeader
+        topHeader,
+        tipdialog
       }
   };
 </script>
@@ -148,51 +145,6 @@
               opacity: 0.8
               color: #fff
               font-size: 15px
-  .popupDeleteWrap
-    position: fixed
-    z-index: 35
-    top: 50%
-    left: 50%
-    margin-left: -150px
-    margin-top: -95px
-    width: 300px
-    height: 190px
-    text-align: center
-    border-radius: 10px
-    background: #fff
-    .title
-      padding: 20px 0 45px
-      font-size: 15px
-      color: #1b1b1b
-    .content
-      padding-bottom: 45px
-      font-size: 14px
-      color: #1b1b1b
-    .btnWrap
-      display: flex
-      align-items: center
-      height: 52px
-      border-top-1px(#dfdfdf)
-      .btn
-        display: block
-        position: relative
-        flex: 1
-        height: 100%
-        line-height: 52px
-        box-sizing: border-box
-        font-size: 15px
-        &.btnCancel
-          &:after
-            display: block
-            content: ''
-            position: absolute
-            right: 0
-            top: 12px
-            width: 0
-            height: 28px
-            border-right: 1px solid #dfdfdf
-        &.btnConfirm
-          color: #f53663
   .mask
     position: fixed
     top: 0
@@ -200,5 +152,5 @@
     z-index: 10
     width: 100%
     height: 100%
-    background: rgba(0, 0, 0, 0.5)
+    background: rgba(0, 0, 0, 0.8)
 </style>

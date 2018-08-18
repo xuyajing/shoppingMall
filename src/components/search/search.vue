@@ -6,11 +6,11 @@
           <span class="iconSearch">
             <img src="./search.png" width="100%"/>
           </span>
-        <input class="searchTxt" type="text" placeholder="搜索你想要的商品" />
+        <input class="searchTxt" type="text" placeholder="搜索你想要的商品" @keyup.enter="search" v-model="searchTxt"/>
       </div>
     </div>
     <div class="contentWrap" ref="contentWrap">
-      <ul class="goodsList" v-show="!showResult">
+      <ul class="goodsList" v-show="showSearchResult">
         <li class="border-1px">
           <router-link to="/goods/detail/1">
             <img src="./img2.png" />
@@ -19,7 +19,7 @@
           </router-link>
         </li>
       </ul>
-      <div class="noResultWrap" v-show="!showResult">
+      <div class="noResultWrap" v-show="hasNone">
         <img src="./noresult.png" />
         <span class="txt">无搜索结果</span>
       </div>
@@ -32,7 +32,10 @@
   export default {
     data() {
         return {
-            searchResult: []
+            searchResult: [],
+            searchTxt: '',
+            showSearchResult: false,
+            hasNone: false
         };
     },
     created() {
@@ -60,6 +63,15 @@
       },
       goBack() {
           this.$router.go(-1);
+      },
+      search() {
+          if (this.searchTxt === '111') {
+            this.showSearchResult = true;
+            this.hasNone = false;
+          } else {
+            this.showSearchResult = false;
+            this.hasNone = true;
+          }
       }
     }
   };

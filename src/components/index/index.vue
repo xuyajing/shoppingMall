@@ -145,6 +145,15 @@
       .swiper-container
         width: 100%
         height: 100%
+        .swiper-pagination
+          .swiper-pagination-bullet
+            width: 9px
+            height: 9px
+            background: #fff
+            opacity: 0.5
+            &.swiper-pagination-bullet-active
+              background: #f53663
+              opacity: 1
     .goodsListWrap
       width: 94%
       margin: 10px auto

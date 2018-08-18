@@ -20,11 +20,11 @@
           </li>
           <li>
             <span class="icon lock"></span>
-            <input type="password" minlength="6" maxlength="20" v-model="password" placeholder="请输入新密码" />
+            <input type="password" minlength="6" maxlength="20" v-model="password" placeholder="请输入密码" />
           </li>
           <li>
             <span class="icon lock"></span>
-            <input type="password" minlength="6" maxlength="20" v-model="confirmpassword" placeholder="请再次输入新密码" />
+            <input type="password" minlength="6" maxlength="20" v-model="confirmpassword" placeholder="请再次输入密码" />
           </li>
         </ul>
         <a class="btn btnForget">确定</a>
@@ -54,6 +54,9 @@
       }
     },
     methods: {
+      getVerifyCode() {
+          this.computedTime = 60;
+      }
       // 获取短信验证码
 //      async getVerifyCode() {
 //        if (this.rightPhoneNumber) {

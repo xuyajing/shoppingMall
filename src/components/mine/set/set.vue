@@ -96,7 +96,8 @@
           color: #999
     .btnLogout
       display: block
-      margin: 50px 12px
+      width: 300px
+      margin: 50px auto
       height: 40px
       text-align: center
       line-height: 40px

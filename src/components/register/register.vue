@@ -54,6 +54,9 @@
       }
     },
     methods: {
+      getVerifyCode() {
+        this.computedTime = 60;
+      }
       // 获取短信验证码
 //      async getVerifyCode() {
 //        if (this.rightPhoneNumber) {

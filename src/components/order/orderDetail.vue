@@ -220,8 +220,8 @@
             font-size: 14px
         &.toReceipt
           .icon
-            width: 23px
-            height: 19px
+            width: 22px
+            height: 18px
             background-image: url(./receipt.png)
           .logisticsWrap
             font-size: 14px
@@ -254,9 +254,9 @@
         border-bottom-1px(#e9e9e9)
         .icon
           display: inline-block
-          width: 26px
-          height: 30px
-          margin: 0 8px 0 12px
+          width: 22px
+          height: 25px
+          margin: 0 15px 0 12px
           vertical-align: middle
           background-image: url(./address.png)
           background-size: 100%
@@ -323,7 +323,7 @@
         border-top-1px(#dfdfdf)
         border-bottom-1px(#dfdfdf)
         ul
-          padding: 5px 24px
+          padding: 5px 12px 5px 24px
           li
             display: flex
             align-items: center
@@ -333,6 +333,7 @@
             font-size: 12px
             color: #333
             .value
+              font-size: 14px
               color: #999
             &:last-child
               .value

@@ -50,6 +50,7 @@
       flex: 1
       text-align: center
       font-size: 15px
+      color: #f53663
     .btnNew
       position: absolute
       right: 12px

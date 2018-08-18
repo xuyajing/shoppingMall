@@ -13,7 +13,7 @@
             <span class="rightArrow"></span>
           </a>
         </div>
-        <div class="addressWrap">
+        <div class="addressWrap" v-show="!hasNoAddr">
           <span class="icon"></span>
           <div class="main">
             <div class="info">
@@ -24,7 +24,18 @@
           </div>
           <span class="rightArrow"></span>
         </div>
-        <ul class="orderList">
+        <ul class="orderList border-1px">
+          <li>
+            <img src="./confirmOrderImg.png" class="thumb" />
+            <div class="infoWrap">
+              <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
+              <span class="type">N°6</span>
+              <div class="foot">
+                <span class="count">发货数量：<em>2</em></span>
+                <span class="total">￥480</span>
+              </div>
+            </div>
+          </li>
           <li>
             <img src="./confirmOrderImg.png" class="thumb" />
             <div class="infoWrap">
@@ -81,7 +92,7 @@
       data() {
         return {
           title: '确认订单',
-          hasNoAddr: false,
+          hasNoAddr: true,
           showPaymentMethod: false,
           showMask: false,
           showDisabled: false,
@@ -212,9 +223,12 @@
       background-repeat: no-repeat
   .orderList
     padding: 0 24px
+    border-bottom-1px(#dfdfdf)
+    overflow: hidden
     li
       display: flex
-      margin: 20px 0
+      padding-top: 20px
+      margin-bottom: 20px
       .thumb
         width: 80px
         height: 60px
@@ -304,8 +318,8 @@
       .exchangeCode
         display: block
         width: 83%
-        height: 38px
-        line-height: 38px
+        height: 40px
+        line-height: 40px
         margin: 50px 30px 18px
         border: 1px solid #999
         border-radius: 20px
@@ -315,9 +329,9 @@
         color: #999
       .btn
         display: block
-        height: 38px
+        height: 40px
         margin: 0 30px 10px
-        line-height: 38px
+        line-height: 40px
         text-align: center
         border-radius: 20px
         box-sizing: border-box
@@ -378,5 +392,5 @@
     z-index: 10
     width: 100%
     height: 100%
-    background: rgba(0, 0, 0, 0.5)
+    background: rgba(0, 0, 0, 0.8)
 </style>

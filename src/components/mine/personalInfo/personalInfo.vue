@@ -180,7 +180,7 @@
         transform: translate3d(0, 0, 0)
       ul
         li
-          width: 93vw
+          width: 100%
           height: 50px
           margin: 0 auto
           line-height: 50px
@@ -193,6 +193,8 @@
             width: 100%
             height: 53px
             line-height: 53px
+          &:nth-child(2)
+            width: 93vw
           &:last-child
             &:after
               border: none

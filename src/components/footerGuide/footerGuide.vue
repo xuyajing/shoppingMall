@@ -74,7 +74,7 @@
             display: block
             width: 20px
             height: 20px
-            margin: 5px auto
+            margin: 7px auto
             background-image: url(./home.png)
             background-size: 100%
             background-repeat: no-repeat
@@ -82,7 +82,7 @@
             display: block
             width: 21px
             height: 22px
-            margin: 4px auto
+            margin: 6px auto
             background-image: url(./commodity.png)
             background-size: 100%
             background-repeat: no-repeat
@@ -90,7 +90,7 @@
             display: block
             width: 21px
             height: 20px
-            margin: 4px auto
+            margin: 7px auto
             background-image: url(./shoppingCart.png)
             background-size: 100%
             background-repeat: no-repeat
@@ -98,7 +98,7 @@
             display: block
             width: 19px
             height: 20px
-            margin: 4px auto
+            margin: 7px auto
             background-image: url(./mine.png)
             background-size: 100%
             background-repeat: no-repeat
@@ -108,4 +108,9 @@
             bottom: 5px
             text-align: center
             line-height: 13px
+        &:nth-child(3)
+          & > a
+            .txt
+              padding-left: 2px
+
 </style>

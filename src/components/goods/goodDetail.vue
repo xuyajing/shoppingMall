@@ -468,12 +468,12 @@
             font-family: 'SimHei'
           dd
             ul
-              display: flex
-              flex-wrap: wrap
               list-style: none
+              font-size: 0
               li
-                flex: 23%
-                margin-right: 2%
+                display: inline-block
+                width: 23%
+                margin-right: 2.3%
                 margin-bottom: 10px
                 height: 30px
                 line-height: 30px

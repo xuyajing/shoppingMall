@@ -99,7 +99,7 @@
               <section class="overdue">
                 <div class="orderNumberWrap">
                   <span class="number">20739564973539569</span>
-                  <span class="state">待兑换</span>
+                  <span class="state">待付款</span>
                 </div>
                 <router-link to="/orders/detail">
                   <ul>

@@ -62,7 +62,7 @@
           <a class="btnView">去逛逛</a>
         </div>
       </div>
-      <div class="controlBar">
+      <div class="controlBar" v-show="!isEmpty">
         <div class="selectAllWrap">
           <span class="icon"></span>
           <span class="txt">全选</span>
@@ -92,7 +92,7 @@
             goodsList: [{
                 isSelected: false
             }],
-            isEmpty: true
+            isEmpty: false
           };
       },
       methods: {

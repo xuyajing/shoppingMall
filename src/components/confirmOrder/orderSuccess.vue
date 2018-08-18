@@ -39,7 +39,7 @@
       color: #333
   .btn
     display: block
-    height: 38px
+    height: 40px
     margin: 0 30px 17px
     line-height: 38px
     text-align: center
