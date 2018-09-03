@@ -176,7 +176,7 @@
            signType: ''
          };
       },
-      created() {
+      activated() {
           this.token = getStore('token');
           this.tradeId = this.$route.query.id;
           this.wxCode = this.$route.query.code;

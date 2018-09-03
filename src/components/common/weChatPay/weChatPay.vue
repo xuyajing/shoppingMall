@@ -50,7 +50,8 @@
               tradeId: '',
               token: '',
               firstStep: true,
-              showPanel: true
+              showPanel: true,
+              isCreatedSuccess: false
           };
       },
       props: {
@@ -97,7 +98,6 @@
             let getRedeemCodeResult = await getRedeemCode(this.redeemCode);
             if (getRedeemCodeResult.msg === '成功') {
               this.redeemCodeValue = getRedeemCodeResult.data.redeemCode.value;
-              this.firstStep = false;
               this.showDisabled = false;
               this.createOrder();
             } else {
@@ -105,7 +105,7 @@
             }
           } else {
             this.createOrder();
-            this.firstStep = false;
+//            this.firstStep = false;
             this.showDisabled = false;
           }
         },
@@ -129,6 +129,8 @@
             .then(response => {
               if (response.msg === '成功') {
 //                this.$router.push('/confirmOrder/success');
+                this.isCreatedSuccess = true;
+                this.firstStep = false;
                 this.appId = response.data.appId;
                 this.nonceStr = response.data.nonceStr;
                 this.package = response.data.package;
@@ -151,16 +153,18 @@
           }
         },
         weChatPay() {
-          if (typeof window.WeixinJSBridge === 'undefined') {
-            if (document.addEventListener) {
-              document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
-            } else if (document.attachEvent) {
-              document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
-              document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
-            }
-          } else {
-            this.onBridgeReady();
-          }
+//            if (this.isCreatedSuccess) {
+              if (typeof window.WeixinJSBridge === 'undefined') {
+                if (document.addEventListener) {
+                  document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+                } else if (document.attachEvent) {
+                  document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
+                  document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+                }
+              } else {
+                this.onBridgeReady();
+              }
+//            }
         },
         onBridgeReady() {
           var self = this;
@@ -181,8 +185,8 @@
                 self.$router.push('/confirmOrder/success');
               } else {
                 // 支付失败
-                self.$router.push({path: '/orders/detail', query: {type: 1, id: this.tradeId}});
-                alert(JSON.stringify(res));
+                self.$router.push({path: '/orders/detail', query: {type: 1, id: self.tradeId}});
+//                alert(JSON.stringify(res));
               }
 //              else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 //                alert("支付过程中用户取消");

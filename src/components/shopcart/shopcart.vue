@@ -48,7 +48,7 @@
         <div class="noResult" v-if="isEmpty">
           <img src="./empty.png" width="68px" />
           <span class="txt">购物车还没有商品哦</span>
-          <a class="btnView">去逛逛</a>
+          <router-link to="/goods" class="btnView" >去逛逛</router-link>
         </div>
       </div>
       <div class="controlBar" v-if="!isEmpty">
