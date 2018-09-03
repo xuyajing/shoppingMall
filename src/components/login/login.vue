@@ -2,18 +2,18 @@
   <transition name="move">
     <div class="loginWrap">
       <top-header :title="title"></top-header>
-      <form class="loginForm">
+      <form class="loginForm" method="post">
         <ul>
           <li>
             <span class="icon phone"></span>
-            <input type="tel" maxlength="11" v-model="phoneNumber" placeholder="请输入手机号" />
+            <input type="tel" maxlength="11" v-model.lazy="phone" name="phone" placeholder="请输入手机号" @change="checkPhone"/>
           </li>
           <li>
             <span class="icon lock"></span>
-            <input type="password" minlength="6" maxlength="20" v-model="password" placeholder="请输入密码" />
+            <input type="password" maxlength="20" v-model="password" name="password" placeholder="请输入密码" />
           </li>
         </ul>
-        <a @click="gotoAddress({path: '/index'})" class="btn btnLogin">登录</a>
+        <a class="btn btnLogin" @click.prevent.stop="submitForm">登录</a>
         <a @click="gotoAddress({path: '/register'})" class="btn btnRegister">没有账号？去注册</a>
         <a @click="gotoAddress({path: '/forget'})" class="btnForget">忘记密码？</a>
 
@@ -24,19 +24,51 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {mapMutations} from 'vuex';
+  import {login} from '@/service/getData';
+  import {setStore} from '@/config/mUtils';
   export default {
     data() {
       return {
         title: '登录',
         loginWay: false, // 登录方式，默认手机号码登录
-        phoneNumber: null,
-        password: null
+        phone: '',
+        password: null,
+        rightPhoneNumber: false,
+        userInfo: {}
       };
     },
     methods: {
+      // 判断输入的电话号码
+      checkPhone() {
+        if (!this.phone) return;
+        if (/^1[34578]\d{9}$/.test(this.phone)) {
+          this.rightPhoneNumber = true;
+        } else {
+          this.rightPhoneNumber = false;
+//          this.showAlert = true;
+//          this.alertText = '手机号码格式不正确';
+          alert('手机号码格式不正确');
+        }
+      },
+      async submitForm(e) {
+          e.preventDefault();
+        let loginResult = await login(this.phone, this.password);
+        if (loginResult.msg === '成功') {
+            console.log('phone = ' + this.phone);
+            this.userInfo = {...this.info, phone: this.phone};
+            this.RECORD_USERINFO(this.userInfo);
+            setStore('token', loginResult.data.token);
+            this.$router.push('/');
+        }
+        console.log(loginResult.msg);
+      },
       gotoAddress(path) {
           this.$router.push(path);
-      }
+      },
+      ...mapMutations([
+          'RECORD_USERINFO'
+      ])
     },
     components: {
       topHeader

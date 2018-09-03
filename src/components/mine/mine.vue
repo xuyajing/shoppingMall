@@ -2,10 +2,10 @@
   <div class="mineWrap">
     <div class="contentWrap">
       <div class="personInfoWrap">
-        <img src="./avatar.png" class="avatar"/>
+        <img :src="info.avatar" class="avatar"/>
         <div class="info">
-          <span class="name"><em></em>吴彦祖</span>
-          <span class="phoneNumber"><em></em>18121000000</span>
+          <span class="name"><em></em>{{info.nickname}}</span>
+          <span class="phoneNumber" v-if="info.phone"><em></em>{{info.phone}}</span>
         </div>
       </div>
       <div class="allOrdersWrap">
@@ -21,7 +21,7 @@
             <span class="icon">
               <img src="./exchange.png" width="28px"/>
             </span>
-            <em class="number" v-show="messagesNumber[0] > 0"></em>
+            <em class="number" v-show="info.convertNumber > 0">{{info.convertNumber}}</em>
             <span class="txt">待兑换</span>
           </router-link>
         </li>
@@ -30,7 +30,7 @@
             <span class="icon">
               <img src="./tobeDelivered.png" width="24px" />
             </span>
-            <em class="number" v-show="messagesNumber[1] > 0">3</em>
+            <em class="number" v-show="info.deliveryNumber > 0">{{info.deliveryNumber}}</em>
             <span class="txt">待发货</span>
           </router-link>
         </li>
@@ -39,7 +39,7 @@
             <span class="icon">
               <img src="./pendingReceipt.png" width="29px"/>
             </span>
-            <em class="number" v-show="messagesNumber[2] > 0"></em>
+            <em class="number" v-show="info.goodsNumber > 0">{{info.goodsNumber}}</em>
             <span class="txt">待收货</span>
           </router-link>
         </li>
@@ -48,7 +48,7 @@
             <span class="icon">
               <img src="./completed.png" width="22px"/>
             </span>
-            <em class="number" v-show="messagesNumber[3] > 0"></em>
+            <!--<em class="number" v-show="messagesNumber[3] > 0"></em>-->
             <span class="txt">已完成</span>
           </router-link>
         </li>
@@ -84,8 +84,9 @@
         </li>
       </ul>
       <keep-alive>
-        <router-view></router-view>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
       </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <footer-guide></footer-guide>
   </div>
@@ -93,11 +94,28 @@
 
 <script type="text/ecmascript-6">
   import footerGuide from 'components/footerGuide/footerGuide';
+  import {getMine} from '../../service/getData';
+  import {getStore} from '../../config/mUtils';
+
   export default {
       data() {
           return {
-            messagesNumber: [0, 3, 0, 0]
+//            messagesNumber: [],
+            info: {},
+            token: ''
           };
+      },
+      activated() {
+          this.token = getStore('token');
+          this.initData();
+      },
+      methods: {
+          async initData() {
+              let getMineResult = await getMine(this.token);
+              if (getMineResult.code === 0) {
+                  this.info = getMineResult.data.UserAndTradeStatusNumber;
+              }
+          }
       },
       components: {
         footerGuide

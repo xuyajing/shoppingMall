@@ -3,83 +3,53 @@
     <top-header :title="title"></top-header>
     <div class="confirmOrderMain">
       <div class="main" ref="main">
-        <div class="addAddressWrap" v-show="hasNoAddr">
+        <div class="addAddressWrap" v-if="hasNoAddr">
           <div class="left">
             <span class="icon"></span>
             <span class="txt">还没有收货地址哦！</span>
           </div>
-          <a class="btnAddWrap">
+          <router-link class="btnAddWrap" :to="{path: '/address', query: {type: 1}}">
             <span class="txt">点击去添加</span>
             <span class="rightArrow"></span>
-          </a>
+          </router-link>
         </div>
-        <div class="addressWrap" v-show="!hasNoAddr">
-          <span class="icon"></span>
-          <div class="main">
-            <div class="info">
-              <span class="addressee">收件人：吴彦祖</span>
-              <span class="phoneNumber">18120000000</span>
+        <div class="addressWrap" v-if="!hasNoAddr">
+          <router-link class="btnAddWrap" :to="{path: '/address', query: {type: 1}}">
+            <span class="icon"></span>
+            <div class="main">
+              <div class="info">
+                <span class="addressee">收件人：{{confirmAddress.consigneeName}}</span>
+                <span class="phoneNumber">{{confirmAddress.consigneeTel}}</span>
+              </div>
+              <div class="address">{{confirmAddress.provinceName}}{{confirmAddress.cityName}}{{confirmAddress.districtName}}{{confirmAddress.address}}</div>
             </div>
-            <div class="address">安徽省芜湖市鸠江区安徽芜湖九江经济开发区融汇科技产业园1栋201亚原子</div>
-          </div>
-          <span class="rightArrow"></span>
+            <span class="rightArrow"></span>
+          </router-link>
         </div>
         <ul class="orderList border-1px">
-          <li>
-            <img src="./confirmOrderImg.png" class="thumb" />
+          <li v-for="(item, index) in productList" :key="index">
+            <img :src="item.thumb" class="thumb" />
             <div class="infoWrap">
-              <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
-              <span class="type">N°6</span>
+              <div class="title">{{item.name}}</div>
+              <span class="type" v-for="(v, k) in item.optionValueList" :key="k">{{v.valueName}}</span>
               <div class="foot">
-                <span class="count">发货数量：<em>2</em></span>
-                <span class="total">￥480</span>
-              </div>
-            </div>
-          </li>
-          <li>
-            <img src="./confirmOrderImg.png" class="thumb" />
-            <div class="infoWrap">
-              <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
-              <span class="type">N°6</span>
-              <div class="foot">
-                <span class="count">发货数量：<em>2</em></span>
-                <span class="total">￥480</span>
+                <span class="count">发货数量：<em>{{item.num}}</em></span>
+                <span class="total">￥{{item.price}}</span>
               </div>
             </div>
           </li>
         </ul>
         <div class="calulateWrap">
-          <div class="total">合计：<span>￥480</span></div>
+          <div class="total">合计：<span>￥{{totalPrice}}</span></div>
           <a class="btnExchange" @click.stop.prevent="exchangeGoods">去兑换</a>
         </div>
-        <div class="footPopupWrap">
-          <transition name="fold">
-            <div class="paymentMethodWrap" v-show="showPaymentMethod">
-              <div class="inputWrap" v-show="isFirstStep">
-                <a class="btnClose" @click.stop.prevent="hideExchangePanel"></a>
-                <input type="text" class="exchangeCode" placeholder="请输入兑换码，可为空"/>
-                <a class="btnNextStep btn" @click.stop.prevent="nextStep">下一步</a>
-                <p class="tips">如果没有兑换码，请直接点击下一步</p>
-              </div>
-              <div class="compareWrap" v-show="!isFirstStep">
-                <a class="btnClose" @click.stop.prevent="payFail"></a>
-                <p class="total">总价：{{total}}元</p>
-                <p class="codeValue">兑换码：{{exchangeCodeValue}}元</p>
-                <p class="toPay">实付：{{toPay}}元</p>
-                <a class="btnOrder btn" v-show="total<=exchangeCodeValue">确定下单</a>
-                <a class="btnPay btn" v-show="total>exchangeCodeValue" @click.stop.prevent="paySuccess">微信支付</a>
-              </div>
-            </div>
-          </transition>
-        </div>
-        <div class="exchangeCodeDisabled" v-show="showDisabled">
-          <span class="iconAttention"></span>
-          <div>
-            <p>兑换码无效</p>
-            <span>请检查您的兑换码</span>
-          </div>
-        </div>
-        <div class="mask" v-show="showMask"></div>
+        <wechat-pay :showPaymentMethod="showPaymentMethod"
+                    :isFirstStep="isFirstStep"
+                    :totalPrice="totalPrice"
+                    :wxCode="wxCode"
+                    :confirmAddress="confirmAddress"
+                    :tradeProductList="tradeProductList"
+                    @hidePanel="hidePanel"></wechat-pay>
       </div>
     </div>
     <router-view></router-view>
@@ -88,49 +58,98 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {mapState, mapMutations} from 'vuex';
+  import {getAddressList} from '../../service/getData';
+  import {getStore} from '../../config/mUtils';
+  import wechatPay from '../common/weChatPay/weChatPay.vue';
+
   export default {
       data() {
         return {
           title: '确认订单',
-          hasNoAddr: true,
           showPaymentMethod: false,
-          showMask: false,
-          showDisabled: false,
-          isFirstStep: true,
-          total: 920.00,
-          exchangeCodeValue: 800.00
+          token: '',
+          wxCode: '',
+          shippingAddress: '',
+          productList: [],
+          isFirstStep: true
         };
       },
       computed: {
-          toPay() {
-              if (this.total > this.exchangeCodeValue) {
-                  return this.total - this.exchangeCodeValue;
+          ...mapState([
+              'addressList', 'selectProducts', 'confirmAddress'
+          ]),
+          totalPrice() {
+            let total = 0;
+            this.productList.forEach((item) => {
+              total += item.num * item.price;
+            });
+            return total;
+          },
+          tradeProductList() {
+            let i = 0;
+            let result = [];
+            this.productList.forEach((item) => {
+              result[i] = {
+                productOptionValueId: item.productOptionValueId,
+                quantity: item.num
+              };
+            });
+            return result;
+          },
+          hasNoAddr() {
+              if (this.confirmAddress !== null) {
+                  return false;
               } else {
-                  return 0.00;
+                  return true;
               }
           }
       },
+      activated() {
+        this.productList = JSON.parse(getStore('selectProducts'));
+        if (this.$route.query.code) {
+            this.wxCode = this.$route.query.code;
+        }
+        this.token = getStore('token');
+        if (this.addressList.length === 0) {
+            this.initAddress();
+        }
+      },
       methods: {
+        ...mapMutations([
+            'SET_CONFIRM_ADDRESS', 'SET_ADDRESS', 'SET_REDEEM'
+        ]),
+        async initAddress() {
+          let getAddressListResult = await getAddressList(this.token);
+          if (getAddressListResult.msg === '成功') {
+            this.SET_ADDRESS(getAddressListResult.data.addressList);
+            //              for (var i = 0; i < this.addressList.length; i++) {
+            //                this.hasAreaList[i] = this.getAreaName(this.addressList[i].provinceId, this.addressList[i].cityId, this.addressList[i].districtId);
+            //                console.log('this.addressList[i].provinceId = ' + this.addressList[i].provinceId);
+            //                console.log('this.addressList[i].cityId = ' + this.addressList[i].cityId);
+            //                console.log('this.addressList[i].districtId = ' + this.addressList[i].districtId);
+            //                console.log('this.hasAreaList[i]' + this.getAreaName(this.addressList[i].provinceId, this.addressList[i].cityId, this.addressList[i].districtId));
+            //              }
+            for (var i = 0; i < this.addressList.length; i++) {
+              if (this.addressList[i].isDef) {
+                this.SET_CONFIRM_ADDRESS(this.addressList[i]);
+              }
+            }
+          } else {
+            alert(getAddressListResult.msg);
+          }
+        },
+        // 去兑换
         exchangeGoods() {
             this.showPaymentMethod = true;
-            this.showMask = true;
         },
-        nextStep() {
-            this.isFirstStep = false;
-        },
-        paySuccess() {
-          this.isFirstStep = true;
-          this.$router.push('/confirmOrder/success');
-        },
-        payFail() {
-          this.isFirstStep = true;
-          this.showPaymentMethod = false;
-          this.showMask = false;
-          this.$router.push({path: '/orders/detail', query: {type: 1}});
+        hidePanel() {
+            this.showPaymentMethod = false;
         }
       },
       components: {
-        topHeader
+        topHeader,
+        wechatPay
       }
   };
 
@@ -184,43 +203,46 @@
         background-size: 100%
         background-repeat: no-repeat
   .addressWrap
-    display: flex
-    align-items: center
     width: 100%
     height: 90px
-    padding: 0 12px
-    box-sizing: border-box
-    border-bottom-1px(#e9e9e9)
-    .icon
-      display: inline-block
-      width: 26px
-      height: 30px
-      margin: 0 8px 0 12px
-      vertical-align: middle
-      background-image: url(./address.png)
-      background-size: 100%
-      background-repeat: no-repeat
-    .main
-      flex: 1
-      .info
-        margin-bottom: 5px
-        font-size: 14px
-        color: #333
-        .addressee
-          padding-right: 15px
-      .address
-        line-height: 17px
-        font-size: 12px
-        color: #999
-    .rightArrow
-      display: inline-block
-      vertical-align: middle
-      width: 9px
-      height: 15px
-      margin-left: 40px
-      background-image: url(./right.png)
-      background-size: 100%
-      background-repeat: no-repeat
+    a
+      display: flex
+      align-items: center
+      width: 100%
+      height: 100%
+      padding: 0 12px
+      box-sizing: border-box
+      border-bottom-1px(#e9e9e9)
+      .icon
+        display: inline-block
+        width: 26px
+        height: 30px
+        margin: 0 8px 0 12px
+        vertical-align: middle
+        background-image: url(./address.png)
+        background-size: 100%
+        background-repeat: no-repeat
+      .main
+        flex: 1
+        .info
+          margin-bottom: 5px
+          font-size: 14px
+          color: #333
+          .addressee
+            padding-right: 15px
+        .address
+          line-height: 17px
+          font-size: 12px
+          color: #999
+      .rightArrow
+        display: inline-block
+        vertical-align: middle
+        width: 9px
+        height: 15px
+        margin-left: 40px
+        background-image: url(./right.png)
+        background-size: 100%
+        background-repeat: no-repeat
   .orderList
     padding: 0 24px
     border-bottom-1px(#dfdfdf)
@@ -305,7 +327,7 @@
       &.fold-enter-active, &.fold-leave-active
         transition: all 0.2s linear
       &.fold-enter, &.fold-leave-to
-        transfom: translate3d(0, 0, 0)
+        transform: translate3d(0, 0, 0)
       .btnClose
         position: absolute
         top: 13px

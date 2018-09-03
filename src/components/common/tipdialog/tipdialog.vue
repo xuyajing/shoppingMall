@@ -1,11 +1,14 @@
 <template>
-  <div class="tipDialogWrap">
-      <div class="title">{{title}}提醒</div>
-      <div class="content">{{content}}</div>
-      <div class="btnWrap border-1px">
-        <a class="btnCancel btn" @click.stop.prevent="$emit('cancel')">取消</a>
-        <a class="btnConfirm btn" @click.stop.prevent="$emit('confirm')">确定</a>
-      </div>
+  <div class="dialogWrap">
+    <div class="tipDialogWrap">
+        <div class="title">{{title}}提醒</div>
+        <div class="content">{{content}}</div>
+        <div class="btnWrap border-1px">
+          <a class="btnCancel btn" @click.stop.prevent="$emit('cancel')">取消</a>
+          <a class="btnConfirm btn" @click.stop.prevent="$emit('confirm')">确定</a>
+        </div>
+    </div>
+    <div class="mask" @click.stop.prevent="$emit('cancel')"></div>
   </div>
 </template>
 
@@ -24,6 +27,14 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import '../../../common/stylus/mixin.styl'
+.dialogWrap
+  position: fixed
+  top: 0
+  left: 0
+  z-index: 100
+  width: 100%
+  height: 100%
+  background: rgba(0, 0, 0, 0.7)
   .tipDialogWrap
     position: fixed
     z-index: 35

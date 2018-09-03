@@ -6,6 +6,7 @@ import goodDetail from 'components/goods/goodDetail';
 import shopcart from 'components/shopcart/shopcart';
 import mine from 'components/mine/mine';
 import login from 'components/login/login';
+import loginByWeChat from 'components/login/loginByWeChat';
 import loginSelect from 'components/loginSelect/loginSelect';
 import register from 'components/register/register';
 import bindPhoneNumber from 'components/bindPhoneNumber/bindPhoneNumber';
@@ -16,6 +17,7 @@ import address from 'components/address/address';
 import newAddress from 'components/address/new/new';
 import modifyAddress from 'components/address/modify/modifyAddress';
 import confirmOrder from 'components/confirmOrder/confirmOrder';
+import createOrder from 'components/confirmOrder/createOrder';
 import orderSuccess from 'components/confirmOrder/orderSuccess';
 import orderFailed from 'components/confirmOrder/orderFailed';
 import orderDetail from 'components/order/orderDetail';
@@ -41,17 +43,29 @@ export default new Router({
         redirect: 'index'
       }, {
         path: 'index', // 首页
-        component: index
+        component: index,
+        meta: {
+          keepAlive: true
+        }
       }, {
         path: 'goods', // 商品列表页
         component: goods,
-        children: []
+        children: [],
+        meta: {
+          keepAlive: true
+        }
       }, {
         path: 'shopcart', // 购物车
-        component: shopcart
+        component: shopcart,
+        meta: {
+          keepAlive: true
+        }
       }, {
         path: 'mine', // 我的
         component: mine,
+        meta: {
+          keepAlive: true
+        },
         children: [{
           path: 'set',
           component: set,
@@ -61,7 +75,10 @@ export default new Router({
           }]
         }, {
           path: 'collect',
-          component: collect
+          component: collect,
+          meta: {
+            keepAlive: true
+          }
         }, {
           path: 'personalInfo',
           component: personalInfo,
@@ -75,8 +92,12 @@ export default new Router({
         }]
       }]
     }, {
+      name: 'goodDetail',
       path: '/goods/detail/:id', // 商品详情
-      component: goodDetail
+      component: goodDetail,
+      meta: {
+        keepAlive: true
+      }
     }, {
       path: '/login', // 登录
       component: login
@@ -101,30 +122,60 @@ export default new Router({
     }, {
       path: '/address', // 地址页
       component: address,
+      meta: {
+        keepAlive: true
+      },
       children: [{
         path: 'new', // 新建地址
         component: newAddress
       }, {
         path: 'modify',
-        component: modifyAddress
+        component: modifyAddress,
+        meta: {
+          keepAlive: true
+        }
       }]
     }, {
       path: '/confirmOrder', // 确认订单
       component: confirmOrder,
-      children: [{
-        path: 'success',
-        component: orderSuccess
-      }]
+      meta: {
+        keepAlive: true
+      },
+      children: []
+    }, {
+      path: '/confirmOrder/success',
+      component: orderSuccess,
+      meta: {
+        keepAlive: true
+      }
     }, {
       path: '/fail',
       component: orderFailed
     }, {
       path: '/orders',
       component: orders,
+      meta: {
+        keepAlive: true
+      },
       children: [{
         path: 'detail', // 订单详情
-        component: orderDetail
+        component: orderDetail,
+        meta: {
+          keepAlive: true
+        }
       }]
+    }, {
+      path: '/oauth',
+      component: loginByWeChat,
+      meta: {
+        keepAlive: true
+      }
+    }, {
+      path: '/createOrder',
+      component: createOrder,
+      meta: {
+        keepAlive: true
+      }
     }
   ],
   linkActiveClass: 'active'

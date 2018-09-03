@@ -1,8 +1,8 @@
 <template>
   <div class="loginSelectWrap">
     <span class="avatar"></span>
-    <a class="btn btnPhone">手机密码登录</a>
-    <a class="btn btnWeChat">微信登录</a>
+    <router-link to="/login" class="btn btnPhone">手机密码登录</router-link>
+    <a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4ec344f8ab4e7b79&redirect_uri=http://yayawork.natapp1.cc/oauth&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect" class="btn btnWeChat">微信登录</a>
   </div>
 </template>
 

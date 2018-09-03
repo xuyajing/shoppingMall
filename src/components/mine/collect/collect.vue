@@ -2,23 +2,15 @@
   <transition name="move">
     <div class="collectWrap">
       <top-header :title="title" :operation="operation" @doRight="showDeleteDisabledDialog"></top-header>
-      <div class="collectListWrap">
+      <div class="collectListWrap" ref="collectListWrap">
         <ul class="collectList">
-          <li class="border-1px">
-            <router-link to="">
-              <img src="../img2.png" />
-              <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-              <span class="time">2018-02-02</span>
-              <span class="price">¥120</span>
-            </router-link>
-          </li>
-          <li class="border-1px disabled">
-            <router-link to="">
-              <img src="../img2.png" />
-              <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-              <span class="time">2018-02-02</span>
-              <span class="price">¥120</span>
-              <div class="disabledFlag" v-show="isDisabled">
+          <li class="border-1px" v-for="(item, index) in collectList" :key="index" :class="{'disabled': !item.status}">
+            <router-link :to="{name: 'goodDetail', params: {id: item.id}}">
+              <img :src="item.thumb" width="120px" height="90px"/>
+              <span class="title">{{item.name}}</span>
+              <span class="time">{{item.collectDate}}</span>
+              <span class="price">¥{{item.price}}</span>
+              <div class="disabledFlag" v-show="!item.status">
                 <span>已失效</span>
               </div>
             </router-link>
@@ -34,6 +26,10 @@
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
   import tipdialog from 'components/common/tipdialog/tipdialog';
+  import BScroll from 'better-scroll';
+  import {mapState, mapMutations} from 'vuex';
+  import {getCollectList, cleanInvalidCollect} from '../../../service/getData';
+  import {getStore} from '../../../config/mUtils';
 
   export default {
       data() {
@@ -44,10 +40,46 @@
               showDeleteDisabled: false,
               showMask: false,
               tipdialogTitle: '删除',
-              tipdialogContent: '确定从收藏里删除该宝贝吗？'
+              tipdialogContent: '确定从收藏里删除该宝贝吗？',
+              token: ''
           };
       },
+      computed: {
+        ...mapState([
+            'collectList'
+        ])
+      },
+      created() {
+          this.token = getStore('token');
+          this.$nextTick(() => {
+              this.initCollectList();
+              this._initScroll();
+          });
+      },
       methods: {
+        ...mapMutations([
+            'RECORD_COLLECT', 'CLEAN_INVALID_COLLECT_PRODUCT'
+        ]),
+        async initCollectList() {
+            let getCollectListResult = await getCollectList(this.token);
+            if (getCollectListResult.msg === '成功') {
+              for (let i = 0; i < getCollectListResult.data.productList.length; i++) {
+                  this.RECORD_COLLECT(getCollectListResult.data.productList[i]);
+              }
+            } else {
+                alert(getCollectListResult.msg);
+            }
+        },
+        _initScroll() {
+          if (!this.scroll) {
+              this.scroll = new BScroll(this.$refs.collectListWrap, {
+                  click: true,
+                  probeType: 3
+              });
+          } else {
+              this.scroll.refresh();
+          }
+        },
         showDeleteDisabledDialog() {
             this.showMask = true;
             this.showDeleteDisabled = true;
@@ -56,9 +88,13 @@
             this.showMask = false;
             this.showDeleteDisabled = false;
         },
-        deleteDisabled() {
+        async deleteDisabled() {
           this.showMask = false;
           this.showDeleteDisabled = false;
+          let cleanInvalidCollectResult = await cleanInvalidCollect(this.token);
+          if (cleanInvalidCollectResult.code === 0) {
+            this.CLEAN_INVALID_COLLECT_PRODUCT();
+          }
         }
 
       },
@@ -87,6 +123,7 @@
   .collectListWrap
     position: absolute
     top: 60px
+    bottom: 0
     left: 0
     width: 100%
     .collectList

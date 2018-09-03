@@ -2,54 +2,30 @@
   <div class="goodsWrap">
     <search-bar></search-bar>
     <div class="contentWrap" ref="contentWrap">
-      <ul class="goodsList">
-        <li class="border-1px">
-          <router-link to="/goods/detail/1">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-        <li class="border-1px">
-          <router-link to="/goods/detail/:id">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-        <li class="border-1px">
-          <router-link to="/goods/detail/:id">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-        <li class="border-1px">
-          <router-link to="/goods/detail/:id">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-        <li class="border-1px">
-          <router-link to="/goods/detail/:id">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-        <li class="border-1px">
-          <router-link to="/goods/detail/:id">
-            <img src="./img2.png" />
-            <span class="title">sofina苏菲娜隔离霜防晒妆前乳控油持久裸妆保湿遮瑕日版</span>
-            <span class="price">¥120</span>
-          </router-link>
-        </li>
-      </ul>
+
+      <scroll ref="scroll"
+              :dataList = "productList"
+              :scrollbar="scrollbar"
+              :pullDownRefresh="pullDownRefresh"
+              :pullUpLoad="pullUpLoad"
+              :beforePullUpWord="beforePullUpWord"
+              :startY="parseInt(startY)"
+              @onPullDown="onPullingDown"
+              @onPullUp="onPullingUp">
+        <ul class="goodsList">
+          <li class="border-1px" v-for="(item, index) in productList" :key="index">
+            <router-link :to="{name: 'goodDetail', params: {id: item.id}}">
+              <img :src="item.thumb" width="120px" height="90px" />
+              <span class="title">{{item.name}}</span>
+              <span class="price">¥{{item.price}}</span>
+            </router-link>
+          </li>
+        </ul>
+      </scroll>
     </div>
     <footer-guide></footer-guide>
     <keep-alive>
-      <router-view></router-view>
+      <router-view v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
   </div>
 </template>
@@ -57,29 +33,84 @@
 <script type="text/ecmascript-6">
   import searchBar from 'components/searchBar/searchBar';
   import footerGuide from 'components/footerGuide/footerGuide';
-  import BScroll from 'better-scroll';
+  import scroll from '../common/scroll/scroll.vue';
+  import {getProductList} from '@/service/getData';
+  import {getStore} from '@/config/mUtils';
 
   export default {
-      created() {
-          this.$nextTick(() => {
-            this._initScroll();
-          });
+      data() {
+          return {
+              productList: [],
+              token: '',
+              page: 1,
+              pageSize: 10,
+              hasMore: true,
+              pullDownRefresh: {
+                threshold: 90,
+                stop: 40
+              },
+              pullUpLoad: {
+                threshold: -50
+              },
+              scrollbar: true,
+              startY: 0,
+              beforePullUpWord: '加载更多'
+          };
+      },
+      activated() {
+          this.token = getStore('token');
+          this.page = 1;
+          this.loadData();
+          this.productList = [];
+          this.beforePullUpWord = '加载更多';
+          this.hasMore = true;
       },
       methods: {
-          _initScroll() {
-            if (!this.scroll) {
-              this.scroll = new BScroll(this.$refs.contentWrap, {
-                click: true,
-                probeType: 3
-              });
-            } else {
-              this.scroll.refresh();
-            }
+          async loadData() {
+              let getProductListResult = await getProductList(this.token, this.page, this.pageSize);
+              if (getProductListResult.data.productList.length > 0) {
+                this.productList = this.productList.concat(getProductListResult.data.productList);
+              }
+//              if (getProductListResult.data.productList.length < this.pageSize) {
+//                  this.hasMore = false;
+//                  this.beforePullUpWord = '没有更多了';
+//              }
+          },
+          // 上拉加载
+          async onPullingUp() {
+              if (this.hasMore) {
+                this.$refs.scroll.beforePullUp();
+                this.page = this.page + 1;
+                let getProductListResult = await getProductList(this.token, this.page, this.pageSize);
+
+                if (getProductListResult.data.productList.length < this.pageSize) {
+                  this.hasMore = false;
+                }
+                setTimeout(() => {
+                  if (getProductListResult.data.productList.length > 0) {
+                    this.productList = this.productList.concat(getProductListResult.data.productList);
+                  } else {
+                      this.beforePullUpWord = '没有更多了';
+                      this.$refs.scroll.disable();
+                  }
+                  this.$refs.scroll.finish('PullUp');
+                }, 2000);
+              }
+          },
+          async onPullingDown() {
+            // 下拉刷新
+            this.page = 1;
+            let getProductListResult = await getProductList(this.token, this.page, this.pageSize);
+            setTimeout(() => {
+              this.$refs.scroll.finish('PullDown');
+              this.productList = getProductListResult.data.productList;
+            }, 2000);
           }
       },
       components: {
         footerGuide,
-        searchBar
+        searchBar,
+        scroll
       }
   };
 </script>

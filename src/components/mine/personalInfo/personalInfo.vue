@@ -7,26 +7,26 @@
           <li class="border-1px" @click.stop.prevent="showSelectAvatar">
             <span class="text">个人头像</span>
             <span class="avatar">
-              <img src="" />
+              <img :src="userInfo.avatar" />
             </span>
             <span class="rightArrow"></span>
           </li>
           <li class="border-1px">
             <router-link to="/mine/personalInfo/name">
               <span class="text">姓名昵称</span>
-              <span class="value">吴彦祖</span>
+              <span class="value">{{userInfo.nickname}}</span>
               <span class="rightArrow"></span>
             </router-link>
           </li>
           <li class="border-1px" @click.stop.prevent="showSelectSex">
             <span class="text">性别</span>
-            <span class="value">男</span>
+            <span class="value">{{userInfo.gender}}</span>
             <span class="rightArrow"></span>
           </li>
           <li class="border-1px">
             <router-link to="/mine/personalInfo/telephone">
               <span class="text">电话</span>
-              <span class="value">18121000000</span>
+              <span class="value">{{userInfo.phone}}</span>
               <span class="rightArrow"></span>
             </router-link>
           </li>
@@ -40,7 +40,13 @@
                 <strong>更换头像</strong>
               </li>
               <li class="border-1px">拍照</li>
-              <li class="border-1px">相册</li>
+              <li class="border-1px selectAvatar">
+                <form ref="form">
+                  <input type="file" name="file" accept="image/*" @change="handleUploadAvatar" ref="file" class="uploadAvatar" />
+                </form>
+                  <!--<croppa v-model="myCroppa" class="uploadAvatar"></croppa>-->
+                <span>相册</span>
+              </li>
               <li class="cancel" @click.stop.prevent="cancelSelect">取消</li>
             </ul>
           </div>
@@ -51,14 +57,14 @@
               <li class="title border-1px">
                 <strong>选择性别</strong>
               </li>
-              <li class="border-1px">男</li>
-              <li class="border-1px">女</li>
+              <li class="border-1px" @click.stop.prevent="updateGender('男')">男</li>
+              <li class="border-1px" @click.stop.prevent="updateGender('女')">女</li>
               <li class="cancel" @click.stop.prevent="cancelSelect">取消</li>
             </ul>
           </div>
         </transition>
       </div>
-      <div class="mask" v-show="isShowMask"></div>
+      <div class="mask" v-show="isShowMask" @click.stop.prevent="cancelSelect"></div>
       <keep-alive>
         <router-view></router-view>
       </keep-alive>
@@ -68,6 +74,9 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {mapState, mapMutations} from 'vuex';
+  import {getStore} from '../../../config/mUtils';
+  import {getUserInfo, updateGender, updateAvatar} from '../../../service/getData';
 
   export default {
       data() {
@@ -75,10 +84,85 @@
             title: '个人信息',
             isShowSeletAvatar: false,
             isShowSelectSex: false,
-            isShowMask: false
+            isShowMask: false,
+            token: '',
+            avatar: ''
           };
       },
+      computed: {
+        ...mapState([
+            'userInfo'
+        ])
+      },
+      created() {
+        this.token = getStore('token');
+        this.$nextTick(() => {
+            this.initUserInfo();
+        });
+      },
       methods: {
+        ...mapMutations([
+          'SET_USERINFO', 'UPDATE_USERINFO'
+        ]),
+        async initUserInfo() {
+          let userInfoResult = await getUserInfo(this.token);
+          if (userInfoResult.msg === '成功') {
+              let info = userInfoResult.data.information;
+            this.SET_USERINFO({
+                avatar: info.avatar,
+                gender: info.gender ? '女' : '男',
+                nickname: info.name === 'undefined' ? '' : info.nickname,
+                phone: info.phone
+            });
+          } else {
+              alert(userInfoResult.msg);
+          }
+        },
+        async updateGender(genderStr) {
+            let gender = genderStr === '男' ? 0 : 1;
+            let updateGenderResult = await updateGender(this.token, gender);
+            if (updateGenderResult.msg === '成功') {
+                this.UPDATE_USERINFO({gender: genderStr});
+                this.cancelSelect();
+            } else {
+                alert(updateGenderResult.msg);
+            }
+        },
+        async handleUploadAvatar() {
+            let uploadFile = this.$refs.file.files[0];
+            if (uploadFile.type !== 'image/jpeg' && uploadFile.type !== 'image/png' && uploadFile.type !== 'image/gif') {
+              alert('不是有效的图片文件!');
+              return;
+            }
+            if (uploadFile.size > 1048576) {
+              alert('请选择1M以内的图片！');
+              return false;
+            }
+            let form = new FormData();
+            form.append('file', uploadFile, uploadFile.name);
+            console.log('form = ' + form);
+            await fetch('/api/information/uploadAvatar', {
+                method: 'POST',
+                body: form
+            }).then(res => res.json())
+              .then((response) => {
+              if (response.msg === '成功') {
+                this._updateAvatar(response.data.path);
+              } else {
+                alert(response.msg);
+              }
+            });
+        },
+        async _updateAvatar(avatar) {
+          let updateAvatarResult = await updateAvatar(avatar, this.token);
+          if (updateAvatarResult.msg === '成功') {
+            this.UPDATE_USERINFO({avatar: avatar});
+            this.isShowMask = false;
+            this.isShowSeletAvatar = false;
+          } else {
+              alert(updateAvatarResult.msg);
+          }
+        },
         cancelSelect() {
             this.isShowMask = false;
             this.isShowSeletAvatar = false;
@@ -204,7 +288,18 @@
           &.cancel
             font-size: 15px
             color: #f53663
-
+          &.selectAvatar
+            position: relative
+            width: 100%
+            height: 100%
+            .uploadAvatar
+              position: absolute
+              top: 0
+              left: 0
+              width: 100%
+              height: 100%
+              opacity: 0
+              z-index: 10
   .mask
     position: fixed
     top: 0

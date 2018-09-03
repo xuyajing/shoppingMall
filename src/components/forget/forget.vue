@@ -6,28 +6,28 @@
         <ul>
           <li>
             <span class="icon phone"></span>
-            <input type="tel" maxlength="11" v-model="phoneNumber" placeholder="请输入手机号" />
+            <input type="tel" maxlength="11" v-model="phone" placeholder="请输入手机号" @change="checkPhone"/>
           </li>
           <li class="mobileCodeLi">
             <div class="mobileCodeWrap">
               <span class="icon safe"></span>
-              <input type="text" maxlength="4" v-model="mobileCode" placeholder="请输入验证码">
+              <input type="text" v-model="code" placeholder="请输入验证码" />
             </div>
             <section>
-              <button @click.prevent="getVerifyCode" :class="{right_phone_number:rightPhoneNumber}" v-show="!computedTime" class="btnGetCode">短信验证码</button>
+              <button @click.prevent="getMobileCode" v-show="!computedTime" class="btnGetCode">短信验证码</button>
               <button  @click.prevent v-show="computedTime" class="btnTime">{{computedTime}}S</button>
             </section>
           </li>
           <li>
             <span class="icon lock"></span>
-            <input type="password" minlength="6" maxlength="20" v-model="password" placeholder="请输入密码" />
+            <input type="password" maxlength="20" v-model="password" placeholder="请输入密码" />
           </li>
           <li>
             <span class="icon lock"></span>
-            <input type="password" minlength="6" maxlength="20" v-model="confirmpassword" placeholder="请再次输入密码" />
+            <input type="password" maxlength="20" v-model="rePassword" placeholder="请再次输入密码" />
           </li>
         </ul>
-        <a class="btn btnForget">确定</a>
+        <a class="btn btnForget" @click.stop.prevent="submit">确定</a>
       </form>
     </div>
   </transition>
@@ -35,59 +35,75 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import { forgetPassword, mobileCode } from '@/service/getData';
 
   export default {
     data() {
       return {
         title: '找回密码',
-        phoneNumber: null,
+        phone: null,
         password: null,
-        confirmpassword: null,
-        mobileCode: null,
+        rePassword: null,
+        rightPhoneNumber: false,
+        code: null,
         computedTime: 0 // 倒数记时
       };
     },
-    computed: {
-      // 判断手机号码
-      rightPhoneNumber: function() {
-        return /^1[34578]\d{9}$/.test(this.phoneNumber);
-      }
-    },
     methods: {
-      getVerifyCode() {
+      // 判断输入的电话号码
+      checkPhone() {
+        if (!this.phone) return;
+        if (/^1[34578]\d{9}$/.test(this.phone)) {
+          this.rightPhoneNumber = true;
+        } else {
+          this.rightPhoneNumber = false;
+//          this.showAlert = true;
+//          this.alertText = '手机号码格式不正确';
+          alert('手机号码格式不正确');
+        }
+      },
+      async getMobileCode() {
+        if (this.rightPhoneNumber && !this.hasGotCode) {
           this.computedTime = 60;
+          this.hasGotCode = true;
+          // 倒计时
+          this.timer = setInterval(() => {
+            this.computedTime--;
+            if (this.computedTime === 0) {
+              clearInterval(this.timer);
+              this.hasGotCode = false;
+            }
+          }, 1000);
+          // 获取验证信息
+          let getCode = await mobileCode(this.phone, 2);
+          if (!(getCode.msg === '成功')) {
+            this.showAlert = true;
+            this.alertText = getCode.msg;
+            alert(getCode.msg);
+          }
+        }
+      },
+      checkPassword() {
+        if (!this.password) return;
+        if (!(/^[0-9]|(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/.test(this.password))) {
+          alert('密码格式不正确');
+        }
+      },
+      confirmPassword() {
+        if (!this.rePassword) return;
+        if (this.rePassword !== this.password) {
+          alert('两次输入密码不一致');
+        }
+      },
+      async submit() {
+        console.log('phone = ' + this.phone + 'code = ' + this.code + 'password = ' + this.password + 'rePassword = ' + this.rePassword);
+        let forgetResult = await forgetPassword(this.phone, this.code, this.password, this.rePassword);
+        if (forgetResult.msg === '成功') {
+          this.$router.push('/login');
+        } else {
+          alert(forgetResult.msg);
+        }
       }
-      // 获取短信验证码
-//      async getVerifyCode() {
-//        if (this.rightPhoneNumber) {
-//          this.computedTime = 30;
-//          this.timer = setInterval(() => {
-//            this.computedTime--;
-//            if (this.computedTime === 0) {
-//              clearInterval(this.timer);
-//            }
-//          }, 1000);
-//          // 判读用户是否存在
-//          let exsis = await checkExsis(this.phoneNumber, 'mobile');
-//          if (exsis.message) {
-//            this.showAlert = true;
-//            this.alertText = exsis.message;
-//            return;
-//          } else if (!exsis.is_exists) {
-//            this.showAlert = true;
-//            this.alertText = '您输入的手机号尚未绑定';
-//            return;
-//          }
-//          // 发送短信验证码
-//          let res = await mobileCode(this.phoneNumber);
-//          if (res.message) {
-//            this.showAlert = true;
-//            this.alertText = res.message;
-//            return;
-//          }
-//          this.validate_token = res.validate_token;
-//        }
-//      }
     },
     components: {
       topHeader
@@ -161,6 +177,7 @@
                 color: #fff
                 box-shadow: none
                 border: none
+                outline: none
                 &.btnGetCode
                   background: #f53663
                 &.btnTime

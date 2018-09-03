@@ -5,9 +5,9 @@
       <form class="modifyNameForm">
         <div class="inputWrap">
           <span class="icon"></span>
-          <input type="text" v-model="name"/>
+          <input type="text" v-model="nickname" />
         </div>
-        <a class="btnSave">保存</a>
+        <a class="btnSave" @click.stop.prevent="updateNickname">保存</a>
       </form>
     </div>
   </transition>
@@ -15,12 +15,37 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {mapState, mapMutations} from 'vuex';
+  import {getStore} from '../../../../config/mUtils';
+  import {updateNickname} from '../../../../service/getData';
   export default {
       data() {
           return {
             title: '姓名昵称',
-            name: '吴彦祖'
+            token: '',
+            nickname: ''
           };
+      },
+      computed: {
+        ...mapState([
+            'userInfo'
+        ])
+      },
+      created() {
+          this.token = getStore('token');
+          this.nickname = this.userInfo.nickname;
+      },
+      methods: {
+        ...mapMutations([
+            'UPDATE_USERINFO'
+        ]),
+        async updateNickname() {
+            let updateNickNameResult = await updateNickname(this.token, this.nickname);
+            if (updateNickNameResult.msg) {
+              this.UPDATE_USERINFO({nickname: this.nickname});
+              this.$router.go(-1);
+            }
+        }
       },
       components: {
         topHeader

@@ -4,26 +4,26 @@
       <top-header :title="title"></top-header>
       <form class="modifyTelForm">
         <span class="txt">当前号码</span>
-        <p class="currentTel">135-0001-0002</p>
+        <p class="currentTel">{{currentPhone}}</p>
         <div class="inputWrap telWrap">
           <span class="icon"></span>
-          <input type="text" placeholder="请输入手机号码" maxlength="11" v-model="phoneNumber" />
+          <input type="text" placeholder="请输入手机号码" maxlength="11" v-model="phone" @change="checkPhone" />
         </div>
         <div class="codeWrap">
           <div class="inputCodeWrap">
             <span class="iconCode"></span>
-            <input type="text" placeholder="请输入验证码" maxlength="4" v-model="mobileCode" />
+            <input type="text" placeholder="请输入验证码" v-model="salt" />
           </div>
           <section>
-            <button @click.prevent="getVerifyCode" :class="{right_phone_number:rightPhoneNumber}" v-show="!computedTime" class="btnGetCode">短信验证码</button>
+            <button @click.prevent="getMobileCode" v-show="!computedTime" class="btnGetCode">短信验证码</button>
             <button  @click.prevent v-show="computedTime" class="btnTime">{{computedTime}}S</button>
           </section>
         </div>
         <div class="inputWrap passwordWrap">
           <span class="icon"></span>
-          <input type="password" placeholder="请输入密码">
+          <input type="password" v-model="password" placeholder="请输入密码" @change="checkPassword" />
         </div>
-        <a class="btnConfirm">确定</a>
+        <a class="btnConfirm" @click.stop.prevent="submitForm">确定</a>
       </form>
     </div>
   </transition>
@@ -31,12 +31,82 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {mapState, mapMutations} from 'vuex';
+  import {modifyPhone, mobileCode} from '@/service/getData';
+  import {getStore} from '@/config/mUtils';
 
   export default {
       data() {
           return {
-              title: '电话修改'
+              title: '电话修改',
+              computedTime: 0,
+              phone: '',
+              salt: null,
+              password: null,
+              token: ''
           };
+      },
+      computed: {
+        ...mapState({
+            currentPhone: state => {
+              let phoneStr = state.userInfo.phone.substr(0, 3) + '-' + state.userInfo.phone.substr(3, 4) + '-' + state.userInfo.phone.substr(7, 4);
+              return phoneStr;
+            }
+        })
+      },
+      methods: {
+        ...mapMutations([
+            'UPDATE_USERINFO'
+        ]),
+        // 判断输入的电话号码
+        checkPhone() {
+          if (!this.phone) return;
+          if (/^1[34578]\d{9}$/.test(this.phone)) {
+            this.rightPhoneNumber = true;
+          } else {
+            this.rightPhoneNumber = false;
+//          this.showAlert = true;
+//          this.alertText = '手机号码格式不正确';
+            alert('手机号码格式不正确');
+          }
+        },
+        async getMobileCode() {
+          if (this.rightPhoneNumber && !this.hasGotCode) {
+            this.computedTime = 60;
+            this.hasGotCode = true;
+            // 倒计时
+            this.timer = setInterval(() => {
+              this.computedTime--;
+              if (this.computedTime === 0) {
+                clearInterval(this.timer);
+                this.hasGotCode = false;
+              }
+            }, 1000);
+            // 获取验证信息
+            let getCode = await mobileCode(this.phone, 3);
+            if (!(getCode.msg === '成功')) {
+              this.showAlert = true;
+              this.alertText = getCode.msg;
+              alert(getCode.msg);
+            }
+          }
+        },
+        checkPassword() {
+          if (!this.password) return;
+          if (!(/^[0-9]|(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/.test(this.password))) {
+            alert('密码格式不正确');
+          }
+        },
+        async submitForm() {
+          this.token = await getStore('token');
+          let modifyPhoneResult = await modifyPhone(this.phone, this.password, this.salt, this.token);
+          if (modifyPhoneResult.msg === '成功') {
+              this.UPDATE_USERINFO({phone: this.phone});
+            this.$router.go(-1);
+          } else {
+            alert(modifyPhoneResult.msg);
+          }
+        }
       },
       components: {
         topHeader
@@ -120,6 +190,7 @@
           color: #fff
           box-shadow: none
           border: none
+          outline: none
           &.btnGetCode
             background: #f53663
           &.btnTime

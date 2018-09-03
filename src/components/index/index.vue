@@ -4,11 +4,11 @@
     <div class="contentWrap"  ref="contentWrap">
       <div>
         <div class="swiperWrap">
-          <div class="swiper-container" v-if="pushedGoods.length">
+          <div class="swiper-container" v-if="bannerList.length">
             <div class="swiper-wrapper">
-              <div class="swiper-slide" v-for="(item, index) in pushedGoods" :key="index">
-                <router-link to="{path: '/goods/detail/:id', params: {id: 1}}" :key="item.id" class="link_to_food">
-                  <img src="./slidImg.png" width="100%" height="160px" :alt="item.alt"/>
+              <div class="swiper-slide" v-for="(item, index) in bannerList" :key="index">
+                <router-link :to="{name: 'goodDetail', params: {id: item.id}}" :key="item.id" class="link_to_food">
+                  <img :src="item.image" width="100%" height="160px" />
                 </router-link>
               </div>
             </div>
@@ -16,16 +16,24 @@
           </div>
         </div>
         <div class="goodsListWrap">
-          <ul v-if="goodsList">
-            <li v-for="(item, index) in goodsList" :key="index" :class="{'border-1px': !(goodsList.length%2 ===1 && index === (goodsList.length-1))}">
-              <router-link to="/goods/detail/1'">
-                <img src="./img1.png" width="100%" />
-                <span class="title">{{item.title}}</span>
-                <span class="price">￥{{item.price}}</span>
-              </router-link>
+          <scroll ref="scroll"
+                  :dataList="productList"
+                  :scrollbar="scrollbar"
+                  :pullUpLoad="pullUpLoad"
+                  :beforePullUpWord="beforePullUpWord"
+                  :startY="parseInt(startY)"
+                  @onPullUp="onPullingUp">
+            <ul v-if="productList">
+              <li v-for="(item, index) in productList" :key="index" :class="{'border-1px': !(productList.length%2 ===1 && index === (productList.length-1))}">
+                <router-link :to="{name: 'goodDetail', params: {id: item.id}}">
+                  <img :src="item.thumb" width="100%" />
+                  <span class="title">{{item.name}}</span>
+                  <span class="price">￥{{item.price}}</span>
+                </router-link>
 
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </scroll>
         </div>
       </div>
     </div>
@@ -36,52 +44,32 @@
 
 <script type="text/ecmascript-6">
   import footerGuide from 'components/footerGuide/footerGuide';
-  import BScroll from 'better-scroll';
   import Swiper from 'swiper';
   import searchBar from 'components/searchBar/searchBar';
-
+  import scroll from '../common/scroll/scroll.vue';
+  import {getBannerList, getMainData} from '@/service/getData';
+  import {getStore} from '@/config/mUtils';
   export default {
     data() {
         return {
-          pushedGoods: [{
-              src: '../src/components/index/slidImg.png',
-              title: '111'
-          }, {
-              src: '../src/components/index/slidImg.png',
-              title: '222'
-          }],
-          goodsList: [{
-              imgSrc: '',
-              title: 'Huawei/华为 P20 全面屏徕卡双摄智能',
-              price: 1200,
-              id: 1
-          }, {
-            imgSrc: '',
-            title: 'OLAY大红瓶面霜新生塑颜金纯面霜女滋润补水啊啊',
-            price: 1200,
-            id: 1
-          }, {
-            imgSrc: '',
-            title: 'OLAY大红瓶面霜新生塑颜金纯面霜女滋润补水啊啊',
-            price: 1200,
-            id: 1
-          }, {
-            imgSrc: '',
-            title: 'OLAY大红瓶面霜新生塑颜金纯面霜女滋润补水啊啊',
-            price: 1200,
-            id: 1
-          }, {
-            imgSrc: '',
-            title: 'OLAY大红瓶面霜新生塑颜金纯面霜女滋润补水啊啊',
-            price: 1200,
-            id: 1
-          }]
+          bannerList: [],
+          productList: [],
+          code: '',
+          token: '',
+          hasMore: true,
+          pullDownRefresh: {
+            threshold: 90,
+            stop: 40
+          },
+          pullUpLoad: {
+            threshold: -50
+          },
+          scrollbar: true,
+          startY: 0,
+          beforePullUpWord: '加载更多',
+          page: 1,
+          pageSize: 4
         };
-    },
-    created() {
-        this.$nextTick(() => {
-            this._initScroll();
-        });
     },
     mounted() {
       /* eslint-disable no-new */
@@ -92,39 +80,52 @@
         loop: true
       });
     },
+    activated() {
+        this.page = 1;
+        this.pageSize = 4;
+        this.token = getStore('token');
+        this.init();
+    },
     methods: {
-      _initScroll() {
-        if (!this.scroll) {
-          this.scroll = new BScroll(this.$refs.contentWrap, {
-            click: true,
-            probeType: 3
-          });
+      async init() {
+        let getBannerResult = await getBannerList(this.token);
+        if (getBannerResult.code === 0) {
+          this.bannerList = getBannerResult.data.bannerList;
         } else {
-          this.scroll.refresh();
+            alert(getBannerResult.msg);
+        }
+
+        let getMainDataResult = await getMainData(this.token, this.page, this.pageSize);
+        if (getMainDataResult.code === 0) {
+          this.productList = getMainDataResult.data.productList;
+        } else {
+            alert(getMainDataResult.msg);
         }
       },
-      loadData() {
-//        requestData().then((res) => {
-//          this.data = res.data.concat(this.data);
-//          this.$nextTick(() => {
-//            if (!this.scroll) {
-//              this.scroll = new BScroll(this.$refs.wrapper, {});
-//              this.scroll.on('touchend', (pos) => {
-//                // 下拉动作
-//                if (pos.y > 50) {
-//                  this.loadData();
-//                }
-//              });
-//            } else {
-//              this.scroll.refresh();
-//            }
-//          });
-//        });
+      async onPullingUp() {
+        if (this.hasMore) {
+            this.$refs.scroll.beforePullUp();
+            this.page = this.page + 1;
+            let getMainDataResult = await getMainData(this.token, this.page, this.pageSize);
+            if (getMainDataResult.data.productList.length < this.pageSize) {
+                this.hasMore = false;
+            }
+            setTimeout(function() {
+              if (getMainDataResult.data.productList > 0) {
+                this.productList = this.productList.concat(getMainDataResult.data.productList);
+              } else {
+                  this.beforePullUpWord = '没有更多了';
+                  this.$refs.scroll.disable();
+              }
+              this.$refs.scroll.finish('PullUp');
+            }.bind(this), 2000);
+        }
       }
     },
     components: {
       footerGuide,
-      searchBar
+      searchBar,
+      scroll
     }
   };
 </script>
@@ -155,28 +156,34 @@
               background: #f53663
               opacity: 1
     .goodsListWrap
-      width: 94%
-      margin: 10px auto
+      position: absolute
+      top: 160px
+      bottom: 0
+      width: 100%
+      margin: 10px 12px
+      overflow: hidden
       ul
+        display: flex
+        justify-content: space-between
+        flex-wrap: wrap
         li
           display: inline-block
-          width: 50%
+          width: 163px
           padding-bottom: 10px
           margin-bottom: 10px
-          box-sizing: border-box
-          &:nth-child(odd)
-            padding-right: 5px
           &:nth-child(even)
-            padding-left: 5px
             border-bottom-1px(#dfdfdf)
             &:after
-              width: 200%
-              left: -100%
+              width: 500%
+              left: -250%
           a
             display: block
+            width: 100%
             img
               display: block
               margin-bottom: 6px
+              width: 100%
+              height: 122px
             .title
               display: block
               margin-bottom: 6px

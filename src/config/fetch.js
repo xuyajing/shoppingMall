@@ -4,18 +4,23 @@ import {
 
 export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 	type = type.toUpperCase();
-	url = baseUrl + url;
-
-	if (type == 'GET') {
-		let dataStr = ''; //数据拼接字符串
+	// url = baseUrl + url;
+  var dataStr =''; //数据拼接字符串
+	if (type == 'GET' || type == 'POST') {
+		// let dataStr = ''; //数据拼接字符串
 		Object.keys(data).forEach(key => {
 			dataStr += key + '=' + data[key] + '&';
 		})
 
-		if (dataStr !== '') {
-			dataStr = dataStr.substr(0, dataStr.lastIndexOf('&'));
-			url = url + '?' + dataStr;
-		}
+
+    if (dataStr !== '') {
+      dataStr = dataStr.substr(0, dataStr.lastIndexOf('&'));
+      if (type == 'GET') {
+      url = url + '?' + dataStr;
+      }
+    }
+
+		console.log('url = ' + url);
 	}
 
 	if (window.fetch && method == 'fetch') {
@@ -26,18 +31,23 @@ export default async(url = '', data = {}, type = 'GET', method = 'fetch') => {
 				'Accept': 'application/json',
 				'Content-Type': 'application/json'
 			},
-			mode: "cors",
-			cache: "force-cache"
+			// mode: "cors",
+			// cache: "force-cache"
 		}
 
-		if (type == 'POST') {
-			Object.defineProperty(requestConfig, 'body', {
-				value: JSON.stringify(data)
-			})
-		}
-		
+		// if (type == 'POST') {
+    // 	Object.defineProperty(requestConfig, 'body', {
+    // 		value: JSON.stringify(data)
+    // 	})
+    // }
+    if (type == 'POST') { // fetch模拟表单形式提交
+      requestConfig = {...requestConfig, headers: {'Content-Type': 'application/x-www-form-urlencoded'}};
+      requestConfig.body = dataStr;
+    }
+
 		try {
 			const response = await fetch(url, requestConfig);
+			// const response = await fetch(url);
 			const responseJson = await response.json();
 			return responseJson
 		} catch (error) {

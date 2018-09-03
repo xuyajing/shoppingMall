@@ -18,13 +18,13 @@
             </div>
             <div class="toReceipt topMessage" v-show="type===3">
               <span class="icon"></span>
-              <div class="logisticsWrap">物流单号<span>88284839243975</span></div>
+              <div class="logisticsWrap">物流单号<span>{{orderDetail.shippingNo}}</span></div>
             </div>
             <div class="completed topMessage" v-show="type===4">
               <span class="icon"></span>
               <div class="messageWrap">
                 <strong class="state">交易完成</strong>
-                <p class="info">物流单号<span>88284839243975</span></p>
+                <p class="info">物流单号<span>{{orderDetail.shippingNo}}</span></p>
               </div>
             </div>
           </div>
@@ -42,22 +42,22 @@
             <span class="icon"></span>
             <div class="main">
               <div class="info">
-                <span class="addressee">收件人：吴彦祖</span>
-                <span class="phoneNumber">18120000000</span>
+                <span class="addressee">收件人：{{orderDetail.shippingName}}</span>
+                <span class="phoneNumber">{{orderDetail.shippingPhone}}</span>
               </div>
-              <div class="address">安徽省芜湖市鸠江区安徽芜湖九江经济开发区融汇科技产业园1栋201亚原子</div>
+              <div class="address">{{orderDetail.shippingAddress}}</div>
             </div>
             <span class="rightArrow"></span>
           </div>
           <ul class="orderList">
-            <li>
-              <img src="./confirmOrderImg.png" class="thumb" />
+            <li v-for="(item, index) in orderDetail.products" :key="index">
+              <img :src="item.thumb" class="thumb" />
               <div class="infoWrap">
-                <div class="title">YSL圣罗兰莹亮纯魅唇膏圆管</div>
-                <span class="type">N°6</span>
+                <div class="title">{{item.name}}</div>
+                <span class="type" v-for="(v, k) in item.optionValueList" :key="k">{{v.valueName}}</span>
                 <div class="foot">
-                  <span class="count">发货数量：<em>2</em></span>
-                  <span class="total">￥480</span>
+                  <span class="count">发货数量：<em>{{item.quantity}}</em></span>
+                  <span class="total">￥{{item.price}}</span>
                 </div>
               </div>
             </li>
@@ -66,69 +66,83 @@
             <ul>
               <li v-show="type!==1">
                 <span class="text">兑换码</span>
-                <span class="value">￥400</span>
+                <span class="value">￥{{orderDetail.redeemValue}}</span>
               </li>
               <li :class="type===1 ? 'total' : ''">
                 <span class="text">订单总价</span>
-                <span class="value">￥720</span>
+                <span class="value">￥{{orderDetail.total}}</span>
               </li>
               <li v-show="type!==1">
                 <span class="text">实付</span>
-                <span class="value">￥320</span>
+                <span class="value">￥{{orderDetail.actualPay}}</span>
               </li>
             </ul>
           </div>
           <div class="orderInfoWrap">
             <ul>
-              <li>订单编号：767676678899099009900</li>
-              <li>创建时间：2018-07-19 09:09:09</li>
-              <li v-show="type!==1">交易流水号：20170909787324637824638</li>
-              <li v-show="type!==1">付款时间：2018-07-19 10:00:00</li>
+              <li>订单编号：{{orderDetail.tradeNo}}</li>
+              <li>创建时间：{{orderDetail.createdDate}}</li>
+              <li v-show="type!==1">交易流水号：{{orderDetail.outTradeNo}}</li>
+              <li v-show="type!==1">付款时间：{{orderDetail.paymentTime}}</li>
             </ul>
           </div>
-          <div class="footBtnWrap" v-show="type===1">
-            <a class="btnCancel btn" @click.stop.prevent="showCancelWrap">取消订单</a>
-            <a class="btnContinue btn">继续兑换</a>
+          <div class="footBtnWrap" v-show="type===1 && isShowBtn">
+            <a class="btnCancel btn" @click.stop.prevent="showDialog(orderDetail.id, 1)">取消订单</a>
+            <a class="btnContinue btn" @click.stop.prevent="continuePay">继续兑换</a>
           </div>
           <div class="footBtnWrap" v-show="type===3">
-            <a class="btnConfirm btn" @click.stop.prevent="showPopup">确认收货</a>
+            <a class="btnConfirm btn" @click.stop.prevent="showDialog(orderDetail.id, 0)">确认收货</a>
           </div>
         </div>
       </div>
-      <div class="popupWrap" v-show="showPopupGot">
-        <div class="title">提醒</div>
-        <div class="content">您确认已经收到货了吗？</div>
-        <div class="btnWrap border-1px">
-          <a class="btnCancel btn" @click.stop.prevent="hidePopup">取消</a>
-          <a class="btnConfirm btn" @click.stop.prevent="hidePopup">确定</a>
-        </div>
-      </div>
-      <div class="mask" v-show="showMask" @click.stop.prevent="hidePopup"></div>
-      <div class="stickFootWrap">
-        <transition name="fold">
-          <form class="cancelOrderWrap" v-show="isShowCancelOrder">
-            <a class="btnClose" @click.stop.prevent="hideCancelWrap">取消</a>
-            <div class="selectReasonWrap border-1px">
-              <span class="text">取消原因</span>
-              <div class="optionWrap">
-                <span class="value">{{cancelReason}}</span>
-                <span class="icon"></span>
-              </div>
-            </div>
-            <div class="addReasonWrap">
-              <span class="text">补充说明</span>
-              <textarea :v-model="addReason" placeholder="请输入原因"></textarea>
-            </div>
-            <a class="btnConfirm">确定</a>
-          </form>
-        </transition>
-      </div>
+      <!--<div class="popupWrap" v-show="showPopupGot">-->
+        <!--<div class="title">提醒</div>-->
+        <!--<div class="content">您确认已经收到货了吗？</div>-->
+        <!--<div class="btnWrap border-1px">-->
+          <!--<a class="btnCancel btn" @click.stop.prevent="hidePopup">取消</a>-->
+          <!--<a class="btnConfirm btn" @click.stop.prevent="confirmTrade">确定</a>-->
+        <!--</div>-->
+      <!--</div>-->
+      <!--<div class="mask" v-show="showMask" @click.stop.prevent="hidePopup"></div>-->
+      <!--<div class="stickFootWrap">-->
+        <!--<transition name="fold">-->
+          <!--<form class="cancelOrderWrap" v-show="isShowCancelOrder">-->
+            <!--<a class="btnClose" @click.stop.prevent="hideCancelWrap">取消</a>-->
+            <!--<div class="selectReasonWrap border-1px">-->
+              <!--<span class="text">取消原因</span>-->
+              <!--<div class="optionWrap">-->
+                <!--<span class="value">{{cancelReason}}</span>-->
+                <!--<span class="icon"></span>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="addReasonWrap">-->
+              <!--<span class="text">补充说明</span>-->
+              <!--<textarea :v-model="addReason" placeholder="请输入原因"></textarea>-->
+            <!--</div>-->
+            <!--<a class="btnConfirm">确定</a>-->
+          <!--</form>-->
+        <!--</transition>-->
+      <!--</div>-->
+      <div class="tips" v-show="isShowTips">{{tipsTxt}}</div>
+      <tip-dialog :title="dialogTitle" :content="confirmDialogContent" @cancel="cancelTrade" @confirm="confirmCancelTrade" v-if="isShowCancelTradeDialog"></tip-dialog>
+      <tip-dialog :title="dialogTitle" :content="cancelConfirmDialogContent" @cancel="cancelTrade" @confirm="confirmCancelTrade" v-if="isShowCancelTradeDialog"></tip-dialog>
+      <wechat-pay :showPaymentMethod="showPaymentMethod"
+                  :isFirstStep="isFirstStep"
+                  :totalPrice="orderDetail.total"
+                  :wxCode="wxCode"
+                  :confirmAddress="confirmAddress"
+                  :tradeProductList=null
+                  @hidePanel="hidePanel"></wechat-pay>
     </div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
+  import {getOrderDetail, confirmTrade, cancelTrade} from '../../service/getData';
+  import {getStore} from '../../config/mUtils';
+  import tipDialog from 'components/common/tipdialog/tipdialog';
+  import wechatPay from 'components/common/weChatPay/weChatPay.vue';
 
   export default {
       data() {
@@ -137,43 +151,118 @@
            type: 1, // 1:待兑换，2:待发货，3:待收货，4:已完成
            isPayed: true, // 是否已付款
            hasNoAddr: false,
-           showPopupGot: false, // 显示收货提醒
-           showMask: false, // 显示遮罩层
            cancelReason: '不想拍了',
            addReason: '',
-           isShowCancelOrder: false
+           isShowCancelOrder: false,
+           tradeId: '',
+           orderDetail: {},
+           dialogTitle: '提醒',
+           confirmDialogContent: '您确认已经收到货了吗？',
+           cancelConfirmDialogContent: '确认要取消订单？',
+           isShowCancelTradeDialog: false,
+           isShowConfirmDialog: false,
+           isShowTips: false,
+           tipsTxt: '',
+           isShowBtn: true,
+           showPaymentMethod: false,
+           isFirstStep: false,
+           wxCode: '',
+           confirmAddress: {}
          };
       },
       created() {
-        this.$nextTick(() => {
-            this.type = this.$route.query.type;
-        });
+          this.token = getStore('token');
+          this.tradeId = this.$route.query.id;
+          this.wxCode = this.$route.query.code;
+          this.$nextTick(() => {
+//              this.type = this.$route.query.type;
+          });
+          this.initOrderDetail();
       },
       watch: {
         $route() {
-          this.type = this.$route.query.type;
+          this.token = getStore('token');
+          this.tradeId = this.$route.query.id;
+          this.initOrderDetail();
         }
       },
+      computed: {
+//        tradeProductList() {
+//          let result = [];
+//          for (let i = 0; i < this.orderDetail.products.length; i++) {
+//            result[i] = {
+//              productOptionValueId: this.orderDetail.products[i].productOptionValueId,
+//              quantity: this.orderDetail.products[i].num
+//            };
+//          }
+//          return result;
+//        }
+      },
       methods: {
-          showPopup() {
-            this.showPopupGot = true;
-            this.showMask = true;
+          async initOrderDetail() {
+              let getOrderDetailResult = await getOrderDetail(this.token, this.tradeId);
+              if (getOrderDetailResult.code === 0) {
+                  this.orderDetail = getOrderDetailResult.data.tradeDetail;
+                  this.type = this.orderDetail.status;
+              }
           },
-          hidePopup() {
-              this.showPopupGot = false;
-              this.showMask = false;
+          showDialog(id, type) {
+            this.tradeId = id;
+            if (type === 0) { // 0表示确认收货， 1表示取消订单
+              this.isShowConfirmDialog = true;
+            } else if (type === 1) {
+              this.isShowCancelTradeDialog = true;
+            }
           },
-          showCancelWrap() {
-              this.showMask = true;
-              this.isShowCancelOrder = true;
+          cancelConfirmTrade() {
+            this.isShowConfirmDialog = false;
           },
-          hideCancelWrap() {
-            this.showMask = false;
-            this.isShowCancelOrder = false;
+          cancelTrade() {
+            this.isShowCancelTradeDialog = false;
+          },
+          // 确认收货弹框
+          async confirmTrade() {
+            let confirmTradeResult = await confirmTrade(this.token, this.tradeId);
+            if (confirmTradeResult.code === 0) {
+              this.isShowConfirmDialog = false;
+              this.isShowConfirmDialog = false;
+              this.isShowTips = true;
+              this.tipsTxt = '确认收货成功';
+              setTimeout(() => {
+                this.isShowTips = false;
+                this.$router.push({path: '/orders', query: {type: this.type}});
+              }, 2000);
+            }
+          },
+          // 取消订单弹框
+          async confirmCancelTrade() {
+            let confirmCancelTradeResult = await cancelTrade(this.token, this.tradeId);
+            if (confirmCancelTradeResult.code === 0) {
+              this.isShowCancelTradeDialog = false;
+              this.isShowCancelTradeDialog = false;
+              this.isShowTips = true;
+              this.tipsTxt = '取消订单成功';
+              this.isShowBtn = false;
+              setTimeout(() => {
+                this.isShowTips = false;
+                this.$router.push({path: '/orders', query: {type: this.type}});
+              }, 2000);
+            }
+          },
+          // 去兑换
+          continuePay() {
+            this.showPaymentMethod = true;
+            var url = window.location.href;
+            window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4ec344f8ab4e7b79&redirect_uri=' + url + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect';
+          },
+          hidePanel() {
+            this.showPaymentMethod = false;
           }
       },
       components: {
-        topHeader
+        topHeader,
+        tipDialog,
+        wechatPay
       }
   };
 </script>
@@ -303,7 +392,8 @@
               overflow: hidden
               text-overflow: ellipsis
             .type
-              display: block
+              display: inline-block
+              margin-right: 5px
               margin-bottom: 8px
               font-size: 12px
               color: #999
@@ -506,4 +596,18 @@
         background: #f53663
         color: #fff
         font-size: 14px
+  .tips
+    position: fixed
+    top: 50%
+    left: 50%
+    margin-top: -25px
+    margin-left: -50px
+    width: 100px
+    height: 50px
+    text-align: center
+    line-height: 50px
+    background: rgba(0, 0, 0, 0.7)
+    border-radius: 8px
+    color: #fff
+    font-size: 12px
 </style>

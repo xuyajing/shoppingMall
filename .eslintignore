@@ -3,3 +3,6 @@
 /dist/
 /*.js
 /src/common/js/
+/src/service/
+/src/config/
+/src/store/
