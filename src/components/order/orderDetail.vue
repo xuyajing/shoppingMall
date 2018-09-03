@@ -139,7 +139,7 @@
 
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
-  import {getOrderDetail, confirmTrade, cancelTrade} from '../../service/getData';
+  import {getOrderDetail, confirmTrade, cancelTrade, repay} from '../../service/getData';
   import {getStore} from '../../config/mUtils';
   import tipDialog from 'components/common/tipdialog/tipdialog';
   import wechatPay from 'components/common/weChatPay/weChatPay.vue';
@@ -167,7 +167,13 @@
            showPaymentMethod: false,
            isFirstStep: false,
            wxCode: '',
-           confirmAddress: {}
+           confirmAddress: {},
+           appId: '',
+           timeStamp: '',
+           nonceStr: '',
+           package: '',
+           paySign: '',
+           signType: ''
          };
       },
       created() {
@@ -250,10 +256,59 @@
             }
           },
           // 去兑换
-          continuePay() {
-            this.showPaymentMethod = true;
-            var url = window.location.href;
-            window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4ec344f8ab4e7b79&redirect_uri=' + url + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect';
+          async continuePay() {
+              let repayResult = await repay(this.token, this.tradeId);
+              if (repayResult.code === 0) {
+                  console.log('repayResult.data = ' + repayResult);
+                  this.appId = repayResult.data.appId;
+                  this.nonceStr = repayResult.data.nonceStr;
+                  this.package = repayResult.data.package;
+                  this.paySign = repayResult.data.paySign;
+                  this.signType = repayResult.data.signType;
+                  this.timeStamp = repayResult.data.timeStamp;
+                  this.weChatPay();
+              }
+//            this.showPaymentMethod = true;
+          },
+          weChatPay() {
+            if (typeof window.WeixinJSBridge === 'undefined') {
+              if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+              } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+              }
+            } else {
+              this.onBridgeReady();
+            }
+          },
+          onBridgeReady() {
+            var self = this;
+            window.WeixinJSBridge.invoke(
+              'getBrandWCPayRequest', {
+                'appId': this.appId, // 公众号名称，由商户传入
+                'timeStamp': this.timeStamp, // 时间戳，自1970年以来的秒数
+                'nonceStr': this.nonceStr, // 随机串
+                'package': this.package,
+                'signType': this.signType, // 微信签名方式：
+                'paySign': this.paySign // 微信签名
+              },
+              function(res) {
+  //                alert(res.err_msg);
+                if (res.err_msg === 'get_brand_wcpay_request:ok') {
+                  // 使用以上方式判断前端返回,微信团队郑重提示：
+  //                 res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                  self.$router.push('/confirmOrder/success');
+                } else {
+                  // 支付失败
+//                  self.$router.push({path: '/orders/detail', query: {type: 1, id: this.tradeId}});
+//                  alert(JSON.stringify(res));
+                }
+  //              else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+  //                alert("支付过程中用户取消");
+  //
+  //              }
+              });
           },
           hidePanel() {
             this.showPaymentMethod = false;

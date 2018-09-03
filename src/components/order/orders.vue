@@ -40,7 +40,7 @@
                 </div>
                 <div class="footBtnWrap border-1px" v-if="item.status===1">
                   <a class="btnCancel btn" @click.stop.prevent="showDialog(item.id, 1)">取消订单</a>
-                  <a class="btnContinue btn">继续兑换</a>
+                  <a class="btnContinue btn" @click.stop.prevent="continuePay(item.id)">继续兑换</a>
                 </div>
                 <div class="footBtnWrap border-1px" v-if="item.status===3">
                   <span class="">物流单号：20739564973539569</span>
@@ -56,7 +56,7 @@
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive"></router-view>
       </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
+      <route-view v-if="!$route.meta.keepAlive"></route-view>
     </div>
   </transition>
 </template>
@@ -64,7 +64,7 @@
 <script type="text/ecmascript-6">
   import topHeader from 'components/topHeader/topHeader';
   import BScroll from 'better-scroll';
-  import {getOrderList, getAllOrderList, confirmTrade, cancelTrade} from '../../service/getData';
+  import {getOrderList, getAllOrderList, confirmTrade, cancelTrade, repay} from '../../service/getData';
   import {getStore} from '../../config/mUtils';
   import tipDialog from 'components/common/tipdialog/tipdialog';
 
@@ -156,12 +156,71 @@
               this.initOrderList();
             }
         },
+        // 去兑换
+        async continuePay(tradeId) {
+          let repayResult = await repay(this.token, tradeId);
+          if (repayResult.code === 0) {
+            console.log('repayResult.data = ' + repayResult);
+            this.appId = repayResult.data.appId;
+            this.nonceStr = repayResult.data.nonceStr;
+            this.package = repayResult.data.package;
+            this.paySign = repayResult.data.paySign;
+            this.signType = repayResult.data.signType;
+            this.timeStamp = repayResult.data.timeStamp;
+            this.weChatPay();
+          }
+//            this.showPaymentMethod = true;
+        },
+        weChatPay() {
+          if (typeof window.WeixinJSBridge === 'undefined') {
+            if (document.addEventListener) {
+              document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+            } else if (document.attachEvent) {
+              document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
+              document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+            }
+          } else {
+            this.onBridgeReady();
+          }
+        },
+        onBridgeReady() {
+          var self = this;
+          window.WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+              'appId': this.appId, // 公众号名称，由商户传入
+              'timeStamp': this.timeStamp, // 时间戳，自1970年以来的秒数
+              'nonceStr': this.nonceStr, // 随机串
+              'package': this.package,
+              'signType': this.signType, // 微信签名方式：
+              'paySign': this.paySign // 微信签名
+            },
+            function(res) {
+              //                alert(res.err_msg);
+              if (res.err_msg === 'get_brand_wcpay_request:ok') {
+                // 使用以上方式判断前端返回,微信团队郑重提示：
+                //                 res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                self.$router.push('/confirmOrder/success');
+              } else {
+                // 支付失败
+//                self.$router.push({path: '/orders/detail', query: {type: 1, id: this.tradeId}});
+//                alert(JSON.stringify(res));
+              }
+              //              else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+              //                alert("支付过程中用户取消");
+              //
+              //              }
+            });
+        },
         switchTab(index) {
             this.status = index;
             this.$router.push({path: '/orders', query: {type: index}});
         },
         gotoMine() {
             this.$router.push('/mine');
+        },
+        toDetail(status, id) {
+            var url = 'http://yayawork.natapp1.cc/orders/detail/' + status + '/' + id;
+            window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4ec344f8ab4e7b79&redirect_uri=' + url + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect';
         }
       },
       components: {

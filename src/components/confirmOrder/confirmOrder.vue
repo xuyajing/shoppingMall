@@ -123,13 +123,6 @@
           let getAddressListResult = await getAddressList(this.token);
           if (getAddressListResult.msg === '成功') {
             this.SET_ADDRESS(getAddressListResult.data.addressList);
-            //              for (var i = 0; i < this.addressList.length; i++) {
-            //                this.hasAreaList[i] = this.getAreaName(this.addressList[i].provinceId, this.addressList[i].cityId, this.addressList[i].districtId);
-            //                console.log('this.addressList[i].provinceId = ' + this.addressList[i].provinceId);
-            //                console.log('this.addressList[i].cityId = ' + this.addressList[i].cityId);
-            //                console.log('this.addressList[i].districtId = ' + this.addressList[i].districtId);
-            //                console.log('this.hasAreaList[i]' + this.getAreaName(this.addressList[i].provinceId, this.addressList[i].cityId, this.addressList[i].districtId));
-            //              }
             for (var i = 0; i < this.addressList.length; i++) {
               if (this.addressList[i].isDef) {
                 this.SET_CONFIRM_ADDRESS(this.addressList[i]);

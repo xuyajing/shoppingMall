@@ -330,8 +330,7 @@ export const cancelTrade = (token, tradeId) => fetch('/api/trade/cancel', {
 /*
   继续兑换
  */
-export const repay = (token, tradeId, wxCode) => fetch('/api/trade/repay', {
+export const repay = (token, tradeId) => fetch('/api/trade/repay', {
   token,
-  tradeId,
-  wxCode
-})
+  tradeId
+}, 'POST')

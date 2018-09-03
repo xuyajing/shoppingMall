@@ -160,12 +160,13 @@
       top: 160px
       bottom: 0
       width: 100%
-      margin: 10px 12px
+      margin: 10px 0
       overflow: hidden
       ul
         display: flex
         justify-content: space-between
         flex-wrap: wrap
+        margin: 0 12px
         li
           display: inline-block
           width: 163px
